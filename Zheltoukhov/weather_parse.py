@@ -70,6 +70,8 @@ def got_it(city,lat,lon):
 
 		url = 'https://www.windy.com/multimodel/'+lat+'/'+lon+'?55.752,37.639,5'
 		name_of_file =path+city+'/windy/'+now.strftime('%Y_%m_%dT%H_%M_%S')+'.html'
+		call('vncserver :5',shell=True)
+		call('export DISPLAY=":5"',shell=True)
 		call(path+'saveme '+url+' --browser "firefox" --destination '+name_of_file+' --load-wait-time 15 --save-wait-time 10',shell=True)
 		#name_of_file = './windyMoscow/2019_11_16T19_33_51_windy.html'
 
