@@ -31,8 +31,9 @@ def kgo_METEO():
 				else:
 					kgo_vailasa[tmp[0]]=None
 		print(kgo_vailasa)
-	except:
+	except Exception as e:
 		print('SOCKET ERROR')
+		print(str(e))
 		kgo_vailasa={}
 	return kgo_vailasa
 
@@ -59,102 +60,107 @@ def got_it(city,lat,lon):
 	now = now.replace(hour = hour)
 
 	ontimeDict = {'time':now,'current':resp_dict}
-	if city =='KGO':
-		ontimeDict['meteo']=kgo_METEO()
 	print('')
 	print('')
 	print('')
 	print('')
 	print(now,city,resp_dict)
+	if city =='KGO':
+		ontimeDict['meteo']=kgo_METEO()
 
 	path=os.path.dirname(os.path.abspath(__file__) )+'/'
-	try:
-		os.makedirs(path+city+'/windy/',exist_ok=True)
+	#try:
+	os.makedirs(path+city+'/windy/',exist_ok=True)
 
-		url = 'https://www.windy.com/multimodel/'+lat+'/'+lon+'?55.752,37.639,5'
-		name_of_file =path+city+'/windy/'+now.strftime('%Y_%m_%dT%H_%M_%S')+'.html'
-		call('vncserver :5',shell=True)
-		call('export DISPLAY=":5"',shell=True)
-		call(path+'saveme '+url+' --browser "firefox" --destination '+name_of_file+' --load-wait-time 15 --save-wait-time 10',shell=True)
-		#name_of_file = './windyMoscow/2019_11_16T19_33_51_windy.html'
+	url = 'https://www.windy.com/multimodel/'+lat+'/'+lon+'?55.752,37.639,5'
+	name_of_file =path+city+'/windy/'+now.strftime('%Y_%m_%dT%H_%M_%S')
+	call('vncserver :5',shell=True)
+	call('export DISPLAY=":5"',shell=True)
+	call(path+'saveme '+url+' --browser "firefox" --destination '+name_of_file+' --load-wait-time 15 --save-wait-time 10',shell=True)
+	#name_of_file = './windyMoscow/2019_11_16T19_33_51_windy.html'
 
-		with open(name_of_file) as fp:
-		    soup = BeautifulSoup(fp, 'html.parser')
+	with open(name_of_file+'.html') as fp:
+	    soup = BeautifulSoup(fp, 'html.parser')
 
-		model_list = soup.findAll(class_='model-box')
+	model_list = soup.findAll(class_='model-box')
 
-		allmodelsdict = {}
+	allmodelsdict = {}
 
-		for i in range(4):
-			model = model_list[i].get('data-model')
-			print(model)
+	for i in range(4):
+		model = model_list[i].get('data-model')
+		print(model)
 
-			hours = model_list[i].find(class_="td-hour height-hour d-display-table")
-			Timestamps = []
-			for time_h in hours:
-				Timestamps.append(datetime.fromtimestamp(int(time_h.get('data-ts')[:-3]),timezone.utc) )
-			#print('Timestamps',Timestamps[0])
+		hours = model_list[i].find(class_="td-hour height-hour d-display-table")
+		Timestamps = []
+		for time_h in hours:
+			Timestamps.append(datetime.fromtimestamp(int(time_h.get('data-ts')[:-3]),timezone.utc) )
+		#print('Timestamps',Timestamps[0])
 
-			icons = model_list[i].find(class_="td-icon height-icon d-display-table")
-			icons_list = []
-			for icon in icons:
-				icons_list.append((list(icon.children)[0]).get('src').split('/')[-1] )
-			#print('icons_list',icons_list[0])
+		icons = model_list[i].find(class_="td-icon height-icon d-display-table")
+		icons_list = []
+		for icon in icons:
+			icons_list.append((list(icon.children)[0]).get('src').split('/')[-1] )
+		#print('icons_list',icons_list[0])
 
-			temps = model_list[i].find(class_="td-temp height-temp d-display-table")
-			temp_list = []
-			for temp in temps:
-				temp_list.append(int(temp.contents[0][:-1]) )
-			#print('temp_list',temp_list[0])
+		temps = model_list[i].find(class_="td-temp height-temp d-display-table")
+		temp_list = []
+		for temp in temps:
+			temp_list.append(int(temp.contents[0][:-1]) )
+		#print('temp_list',temp_list[0])
 
-			winds = model_list[i].find(class_="td-wind height-wind d-display-table")
-			wind_list = []
-			for wind in winds:
-				wind_list.append(int(wind.contents[0]) )
-			#print('wind_list',wind_list[0])
+		winds = model_list[i].find(class_="td-wind height-wind d-display-table")
+		wind_list = []
+		for wind in winds:
+			wind_list.append(int(wind.contents[0]) )
+		#print('wind_list',wind_list[0])
 
-			winddirs = model_list[i].find(class_="td-windDir height-windDir d-display-table")
-			winddir_list = []
-			for winddir in winddirs:
-				styl = (list(winddir.children)[0]).get('style')
-				winddir_list.append(int(re.search(r'\d+',styl).group()) ) 
-			#print('winddir_list',winddir_list[0])
+		winddirs = model_list[i].find(class_="td-windDir height-windDir d-display-table")
+		winddir_list = []
+		for winddir in winddirs:
+			styl = (list(winddir.children)[0]).get('style')
+			winddir_list.append(int(re.search(r'\d+',styl).group()) ) 
+		#print('winddir_list',winddir_list[0])
 
-			rains = model_list[i].find(class_="td-rain height-rain d-display-table")
-			rain_list=[]
-			for rain in rains:
-				if len(rain.contents)!=0:
-					if i!=0:
-						rain_list.append(float(rain.contents[0]) ) 
-					else:
-						rain_list.append(float(rain.contents[0][:-2])*10 ) 
-				else:
-					rain_list.append(0. ) 
-			#print('rain_list',rain_list[0])
-
-
-			info =  model_list[i].find(class_="multi-model-desc")
-			model_time_str = list(info.children)[-1][17:-1]
-
-
-			if i==2: 
-				model_time_str = list(info.children)[-1][17:-1]
-				model_time = datetime.strptime(model_time_str,'%Y-%m-%d')
+		rains = model_list[i].find(class_="td-rain height-rain d-display-table")
+		rain_list=[]
+		for rain in rains:
+			if len(rain.contents)!=0:
+				try:
+					rain_list.append(float(rain.contents[0]) ) 
+				except:
+					try:
+						rain_list.append(float(rain.contents[0][:-2])*10 )
+					except:
+						rain_list.append(0)
 			else:
-				model_time_str = list(info.children)[-1][17:-2]
-				model_time = datetime.strptime(model_time_str,'%Y-%m-%dT%H:%M:%S')
-			
-			model_time = model_time.replace(tzinfo=timezone.utc)
+				rain_list.append(0. ) 
+		#print('rain_list',rain_list[0])
 
-			print(model_time)
-			# print(Timestamps[0]-model_time)
 
-			model_dict ={'model':model,'model_time':model_time, 'time':Timestamps, 'icon':icons_list, 
-			'temperature':temp_list, 'wind_speed':wind_list, 'wind_dir':winddir_list, 'rain':rain_list }
+		info =  model_list[i].find(class_="multi-model-desc")
+		#print(list(list(info.children)[-1].children)[-1])
+		#model_time_str = str(list(info.children)[-1])[17:-1]
 
-			allmodelsdict[model]=model_dict
-	except:
-		allmodelsdict={}
+
+		if i==2: 
+			model_time_str = list(info.children)[-1][17:-1]
+			model_time = datetime.strptime(model_time_str,'%Y-%m-%d')
+		else:
+			model_time_str = list(info.children)[-1][17:-2]
+			model_time = datetime.strptime(model_time_str,'%Y-%m-%dT%H:%M:%S')
+		
+		model_time = model_time.replace(tzinfo=timezone.utc)
+
+		print(model_time)
+		# print(Timestamps[0]-model_time)
+
+		model_dict ={'model':model,'model_time':model_time, 'time':Timestamps, 'icon':icons_list, 
+		'temperature':temp_list, 'wind_speed':wind_list, 'wind_dir':winddir_list, 'rain':rain_list }
+
+		allmodelsdict[model]=model_dict
+	#except Exception as e:
+	#	print(str(e))
+	#	allmodelsdict={}
 
 	ontimeDict['forecast']=allmodelsdict
 
