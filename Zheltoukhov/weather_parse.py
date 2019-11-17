@@ -19,7 +19,7 @@ def kgo_METEO():
 		sock.send('1 get data\n'.encode('ascii'))
 		data = sock.recv(1024).decode()[5:].split()
 		sock.close()
-		print(data)
+		#print(data)
 		kgo_vailasa={}
 		for p in data:
 			tmp = p.split('=')
@@ -70,7 +70,7 @@ def got_it(city,lat,lon):
 
 		url = 'https://www.windy.com/multimodel/'+lat+'/'+lon+'?55.752,37.639,5'
 		name_of_file =path+city+'/windy/'+now.strftime('%Y_%m_%dT%H_%M_%S')+'.html'
-		call(path+'saveme '+url+' --browser "firefox" --destination '+name_of_file+' --load-wait-time 5 --save-wait-time 3',shell=True)
+		call(path+'saveme '+url+' --browser "firefox" --destination '+name_of_file+' --load-wait-time 15 --save-wait-time 10',shell=True)
 		#name_of_file = './windyMoscow/2019_11_16T19_33_51_windy.html'
 
 		with open(name_of_file) as fp:
