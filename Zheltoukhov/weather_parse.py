@@ -61,8 +61,11 @@ def got_it(city,lat,lon):
 	ontimeDict = {'time':now,'current':resp_dict}
 	if city =='KGO':
 		ontimeDict['meteo']=kgo_METEO()
-
-	print(now,resp_dict)
+	print('')
+	print('')
+	print('')
+	print('')
+	print(now,city,resp_dict)
 
 	path=os.path.dirname(os.path.abspath(__file__) )+'/'
 	try:
