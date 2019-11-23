@@ -106,8 +106,3 @@ lon='42.6675'
 if __name__ == "__main__":
 	main(city,lat,lon)
 
-#writing test
-# with open('2019_11_19T19_00_00.pkl',"rb") as f:
-# 	mydict = pickle.load(f)
-# print(mydict['forecast'].keys())
-# print(datetime.fromtimestamp(mydict['forecast']['data'][-1]['time']) )
