@@ -69,7 +69,10 @@ def Darksky_Data(city,lat,lon,only_one_flag = True):
 
 	return resp_dict_current, resp_dict_forecast 
 
-def main(city,lat,lon):
+def main():
+	city='KGO'
+	lat='43.74611'		
+	lon='42.6675'
 	kgo_vailasa = Meteo_Parse_data(Kgo_Meteo_Get_Data())
 	resp_dict_current, resp_dict_forecast = Darksky_Data(city,lat,lon)
 
@@ -99,10 +102,8 @@ def main(city,lat,lon):
 
 
 
-city='KGO'
-lat='43.74611'		
-lon='42.6675'
+
 
 if __name__ == "__main__":
-	main(city,lat,lon)
+	main()
 
