@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 You need to have API key in ~/.ads/dev_key
 This script uses ads python package: https://ads.readthedocs.io/en/latest/
