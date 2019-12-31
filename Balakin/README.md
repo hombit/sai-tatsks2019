@@ -14,4 +14,4 @@
 
 Задать нужный канал, имя "бота" и иконку и скопировать созданный webhook url, и положить его в файл
 
-![webhooks](https://master3.sai.msu.ru:444/static/videos/d/2.png)
+![webhooks](https://master3.sai.msu.ru:444/static/videos/d/3.png)
