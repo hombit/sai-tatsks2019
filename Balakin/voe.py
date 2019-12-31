@@ -3,8 +3,6 @@ import gcn
 from discord_webhook import DiscordWebhook, DiscordEmbed
 import datetime
 import re
-import subprocess
-from subprocess import DEVNULL
 import sys
 import lxml
 
@@ -15,6 +13,7 @@ if discord_key == '' or discord_key == 'discordkey_empty':
             discord_key = pw_file.read().strip()
     except FileNotFoundError:
         print('api key is not set and ./discord_apikey is absent, discord notifications will not work')
+        exit(1)
 
 socket_name = {1: 'BATSE_ORIGINAL',
                2: 'Test coords',
@@ -189,22 +188,11 @@ def process_gcn(payload, root):
             err = float(pos2d.find('.//{*}Error2Radius').text)
             print("errorbox=", err, flush=True)
             has_coords = True
-        except:
+        except AttributeError:
             has_coords = False
     else:
         has_coords = False
     print("===END===", flush=True)
-    if 'skymap_fits' in params:
-        try:
-            # должно работать только на master3.sai.msu.ru, лучш не трогать
-            subprocess.run("ligo_pointdirs -w {skymap} -m -o {graceid}-{sernum}".format(
-                skymap=params['skymap_fits'], graceid=params['GraceID'], sernum=params['Pkt_Ser_Num']).split(), stdout=DEVNULL, stderr=DEVNULL)
-            ligo_pointdirs = True
-        except Exception as lpe:
-            with open('./last_poindirs.log', 'a') as f:
-                f.write(str(lpe))
-            ligo_pointdirs = False
-
     webhook = DiscordWebhook(url=discord_key)
     embed = DiscordEmbed(title=socket_name[int(params['Packet_Type'])] + '({})'.format(params['Packet_Type']), description='seq=' + params['Pkt_Ser_Num'], color=242424)
     embed.set_timestamp(timestamp=datetime.datetime.now().isoformat())
@@ -213,12 +201,9 @@ def process_gcn(payload, root):
     if 'Instruments' in params:
         embed.add_embed_field(name='Instruments', value=params['Instruments'])
     if ('GraceID' in params):
-        if ligo_pointdirs is True:
-            embed.set_image(url='https://master3.sai.msu.ru:444/static/ligo_pointdirs/{graceid}-{sernum}.png'.format(graceid=params['GraceID'], sernum=params['Pkt_Ser_Num']))
-        else:
-            image_data = re.search('^.*/(\w+)\.fits\.gz(,\d)\s*$', params['skymap_fits'], flags=re.I + re.M)
-            embed.set_image(url='https://gracedb.ligo.org/api/superevents/{graceid}/files/{pipeline}.png{seq}'.format(
-                graceid=params['GraceID'], pipeline=image_data.group(1), seq=image_data.group(2)))
+        image_data = re.search('^.*/(\w+)\.fits\.gz(,\d)\s*$', params['skymap_fits'], flags=re.I + re.M)
+        embed.set_image(url='https://gracedb.ligo.org/api/superevents/{graceid}/files/{pipeline}.png{seq}'.format(
+            graceid=params['GraceID'], pipeline=image_data.group(1), seq=image_data.group(2)))
     if 'AlertType' in params:
         embed.add_embed_field(name='Alert Type', value=params['AlertType'])
     if 'TrigID' in params:
@@ -232,12 +217,10 @@ def process_gcn(payload, root):
         embed.add_embed_field(name='Localisation', value="{ra} d {dec} d {eb}".format(ra=ra, dec=dec, eb=err))
     embed.add_embed_field(name='Trigger time', value=trigtime_object.strftime("%Y-%m-%d %H:%M:%S"))
     embed.add_embed_field(name='Notice time', value=noticetime_object.strftime("%Y-%m-%d %H:%M:%S"))
-    embed.add_embed_field(name='Pointdirs status', value=ligo_pointdirs)
     webhook.add_embed(embed)
-    try:
-        webhook.execute()
-    except Exception as e:
-        print('webhook fail, api key?', e)
+    response = webhook.execute()
+    if response.ok is False:
+        print(response.status_code, response.text)
 
 
 if __name__ == '__main__':
