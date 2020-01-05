@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>SkyStar</title>
+</head>
+<form action="" method="post">
+	<p>
+		<body>		
+		    <label for="Name"><b>Star Name</b></label>
+		    {% if Name%}
+		    <input type="text" name="Name" value="{{Name}}">
+		    {% else %}
+		    <input type="text" name="Name">
+		    {% endif %}
+		</body>
+	</p>
+	<body>
+		<label for="RA"><b>RA</b></label>
+		{% if RA%}
+	    <input type="text" name="RA" value="{{RA}}">
+	    {% else %}
+	    <input type="text" name="RA">
+	    {% endif %}
+	</body>
+	<body>
+		<label for="DEC"><b>DEC</b></label>
+		{% if RA%}
+	    <input type="text" name="DEC" value="{{DEC}}">
+	    {% else %}
+	    <input type="text" name="DEC">
+	    {% endif %}
+	</body>
+	<div>
+		{% if ZOOM%}
+    	<input type="checkbox" id="Zoom out" name="ZoomOut" value={{ZOOM}} checked>
+    	{% else %}
+    	<input type="checkbox" id="Zoom out" name="ZoomOut">
+    	{% endif %}
+    	<label for="Zoom out">Zoom Out</label>
+  	</div>
+  	<div>
+		{% if THRES%}
+    	<input type="checkbox" id="Threshold" name="Threshold" value={{THRES}} checked>
+    	{% else %}
+    	<input type="checkbox" id="Threshold" name="Threshold">
+    	{% endif %}
+    	<label for="Threshold">Threshold 5m</label>
+  	</div>
+	<input type="submit">
+</form>
+<div>
+{% if Error%}
+	<b>{{ Error }}</b>
+{% endif %}
+
+</div>
+<body>
+{% if image%}
+	<img src={{ image }}>
+{% endif %}
+
+</body>
+
+
+</html>
