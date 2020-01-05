@@ -34,55 +34,24 @@ def postreq():
                                 min_mag=i
                             if i["M.V"]<min_mag["M.V"]:
                                 min_mag=i
+                                
+                    return render_page(str_html='hello.html',Name=request.form['Name'],image="data:image/png;base64,"+ base64.b64encode(create_figure(min_mag['ra'],min_mag['dec'],scale,thres)).decode("UTF-8"),RA=min_mag['ra'],DEC=min_mag['dec'],ZOOM=scale,THRES=thres,Error="Magnitude: "+min_mag['M.V'])
                     
-                    if scale==1:
-                        if thres==10:
-                            return render_template('hello.html',Name=request.form['Name'],image="data:image/png;base64,"+ base64.b64encode(create_figure(min_mag['ra'],min_mag['dec'],scale,thres)).decode("UTF-8"),RA=min_mag['ra'],DEC=min_mag['dec'],Error="Magnitude: "+min_mag['M.V'])
-                        else:
-                            return render_template('hello.html',Name=request.form['Name'],image="data:image/png;base64,"+ base64.b64encode(create_figure(min_mag['ra'],min_mag['dec'],scale,thres)).decode("UTF-8"),RA=min_mag['ra'],DEC=min_mag['dec'],THRES=thres,Error="Magnitude: "+min_mag['M.V'])
-                    else:
-                        if thres==10:
-                            return render_template('hello.html',Name=request.form['Name'],image="data:image/png;base64,"+ base64.b64encode(create_figure(min_mag['ra'],min_mag['dec'],scale,thres)).decode("UTF-8"),RA=min_mag['ra'],DEC=min_mag['dec'],ZOOM=scale,Error="Magnitude: "+min_mag['M.V'])
-                        else:
-                            return render_template('hello.html',Name=request.form['Name'],image="data:image/png;base64,"+ base64.b64encode(create_figure(min_mag['ra'],min_mag['dec'],scale,thres)).decode("UTF-8"),RA=min_mag['ra'],DEC=min_mag['dec'],ZOOM=scale,THRES=thres,Error="Magnitude: "+min_mag['M.V'])
                 except:
                     if request.form["RA"]!='' and request.form["DEC"]!='':
                         try:           
                             resp=requests.get('http://simbad.u-strasbg.fr/simbad/sim-nameresolver?coord='+request.form['RA']+'+'+request.form['DEC']+'&data=I.0,J,M(V)&output=json').json()
                             for i in resp:
-                                if ('dec' in i) and ('ra' in i):
-                                    if scale==1:
-                                        if thres==10:
-                                            return render_template('hello.html',Name=i["mainId"],image="data:image/png;base64,"+ base64.b64encode(create_figure(i['ra'],i['dec'],scale,thres)).decode("UTF-8"),RA=i['ra'],DEC=i['dec'],Error="Star with name: "+request.form["Name"]+" not found. Execution of coordinates search.\n"+"Closest star (distance={:.2f} asec): Magnitude: {:.1f}".format(float(i["distance"])*60.0,float(i["M.V"])))
-                                        else:
-                                            return render_template('hello.html',Name=i["mainId"],image="data:image/png;base64,"+ base64.b64encode(create_figure(i['ra'],i['dec'],scale,thres)).decode("UTF-8"),RA=i['ra'],DEC=i['dec'],Error="Star with name: "+request.form["Name"]+" not found. Execution of coordinates search.\n"+"Closest star (distance={:.2f} asec): Magnitude: {:.1f}".format(float(i["distance"])*60.0,float(i["M.V"])),THRES=thres)
-                                    else:
-                                        if thres==10:
-                                            return render_template('hello.html',Name=i["mainId"],image="data:image/png;base64,"+ base64.b64encode(create_figure(i['ra'],i['dec'],scale,thres)).decode("UTF-8"),RA=i['ra'],DEC=i['dec'],Error="Star with name: "+request.form["Name"]+" not found. Execution of coordinates search.\n"+"Closest star (distance={:.2f} asec): Magnitude: {:.1f}".format(float(i["distance"])*60.0,float(i["M.V"])),ZOOM=scale)
-                                        else:
-                                            return render_template('hello.html',Name=i["mainId"],image="data:image/png;base64,"+ base64.b64encode(create_figure(i['ra'],i['dec'],scale,thres)).decode("UTF-8"),RA=i['ra'],DEC=i['dec'],Error="Star with name: "+request.form["Name"]+" not found. Execution of coordinates search.\n"+"Closest star (distance={:.2f} asec): Magnitude: {:.1f}".format(float(i["distance"])*60.0,float(i["M.V"])),ZOOM=scale,THRES=thres)
+                                if ('dec' in i) and ('ra' in i) and ("M.V" in i) and ("distance" in i):
+                                    return render_page(str_html='hello.html',Name=i["mainId"],image="data:image/png;base64,"+ base64.b64encode(create_figure(i['ra'],i['dec'],scale,thres)).decode("UTF-8"),RA=i['ra'],DEC=i['dec'],Error="Star with name: "+request.form["Name"]+" not found. Execution of coordinates search.\n"+"Closest star (distance={:.2f} asec): Magnitude: {:.1f}".format(float(i["distance"])*60.0,float(i["M.V"])),ZOOM=scale,THRES=thres)
+                                    
                             
                         except:
-                            if scale==1:
-                                if thres==10:
-                                    return render_template('hello.html',Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC'])
-                                else:
-                                    return render_template('hello.html',Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC'],THRES=thres)
-                            else:
-                                if thres==10:
-                                    return render_template('hello.html',Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC'],ZOOM=scale)
-                                else:
-                                    return render_template('hello.html',Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC'],ZOOM=scale,THRES=thres)
-                    if scale==1:
-                        if thres==10:
-                            return render_template('hello.html',Error="No data obtained about '"+request.form['Name']+"' star")
-                        else:
-                            return render_template('hello.html',Error="No data obtained about '"+request.form['Name']+"' star",THRES=thres)
-                    else:
-                        if thres==10:
-                            return render_template('hello.html',Error="No data obtained about '"+request.form['Name']+"' star",ZOOM=scale)
-                        else:
-                            return render_template('hello.html',Error="No data obtained about '"+request.form['Name']+"' star",ZOOM=scale,THRES=thres)
+                            return render_page(str_html='hello.html',Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC'],ZOOM=scale,THRES=thres)
+                            
+                                    
+                    return render_page(str_html='hello.html',Error="No data obtained about '"+request.form['Name']+"' star",ZOOM=scale,THRES=thres)
+                            
 
             else:
                 try:
@@ -91,56 +60,38 @@ def postreq():
                     
                     for i in resp:
                         if ('dec' in i) and ('ra' in i):
-                            if scale==1:
-                                if thres==10:
-                                    return render_template('hello.html',Name=i['mainId'],image="data:image/png;base64,"+ base64.b64encode(create_figure(i['ra'],i['dec'],scale,thres)).decode("UTF-8"),RA=i['ra'],DEC=i['dec'],Error="Closest star (distance={:.2f} asec): Magnitude: {:.1f}".format(float(i["distance"])*60.0,float(i["M.V"])))
-                                else:
-                                    return render_template('hello.html',Name=i['mainId'],image="data:image/png;base64,"+ base64.b64encode(create_figure(i['ra'],i['dec'],scale,thres)).decode("UTF-8"),RA=i['ra'],DEC=i['dec'],Error="Closest star (distance={:.2f} asec): Magnitude: {:.1f}".format(float(i["distance"])*60.0,float(i["M.V"])),THRES=thres)
-                            else:
-                                if thres==10:
-                                    return render_template('hello.html',Name=i['mainId'],image="data:image/png;base64,"+ base64.b64encode(create_figure(i['ra'],i['dec'],scale,thres)).decode("UTF-8"),RA=i['ra'],DEC=i['dec'],Error="Closest star (distance={:.2f} asec): Magnitude: {:.1f}".format(float(i["distance"])*60.0,float(i["M.V"])),ZOOM=scale)
-                                else:
-                                    return render_template('hello.html',Name=i['mainId'],image="data:image/png;base64,"+ base64.b64encode(create_figure(i['ra'],i['dec'],scale,thres)).decode("UTF-8"),RA=i['ra'],DEC=i['dec'],Error="Closest star (distance={:.2f} asec): Magnitude: {:.1f}".format(float(i["distance"])*60.0,float(i["M.V"])),ZOOM=scale,THRES=thres)
+                            return render_page(str_html='hello.html',Name=i['mainId'],image="data:image/png;base64,"+ base64.b64encode(create_figure(i['ra'],i['dec'],scale,thres)).decode("UTF-8"),RA=i['ra'],DEC=i['dec'],Error="Closest star (distance={:.2f} asec): Magnitude: {:.1f}".format(float(i["distance"])*60.0,float(i["M.V"])),ZOOM=scale,THRES=thres)
+                            
                     
                 except:
                     ra,dec=get_ra_dec_fromString(request.form['RA'],request.form['DEC'])
                     if ra!=None:
-                        if scale==1:
-                            if thres==10:
-                                return render_template('hello.html',image="data:image/png;base64,"+ base64.b64encode(create_figure(ra,dec,scale,thres)).decode("UTF-8"),RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC'])
-                            else:
-                                return render_template('hello.html',image="data:image/png;base64,"+ base64.b64encode(create_figure(ra,dec,scale,thres)).decode("UTF-8"),RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC'],THRES=thres)
-                        else:
-                            if thres==10:
-                                return render_template('hello.html',image="data:image/png;base64,"+ base64.b64encode(create_figure(ra,dec,scale,thres)).decode("UTF-8"),RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC'],ZOOM=scale)
-                            else:
-                                return render_template('hello.html',image="data:image/png;base64,"+ base64.b64encode(create_figure(ra,dec,scale,thres)).decode("UTF-8"),RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC'],ZOOM=scale,THRES=thres)
+                        
+                        return render_page(str_html='hello.html',image="data:image/png;base64,"+ base64.b64encode(create_figure(ra,dec,scale,thres)).decode("UTF-8"),RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC'],ZOOM=scale,THRES=thres)
+                        
                     else:
-                        if scale==1:
-                            if thres==10:
-                                return render_template('hello.html',RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC']+". Unknown coordinates style!")
-                            else:
-                                return render_template('hello.html',RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC']+". Unknown coordinates style!",THRES=thres)
-                        else:
-                            if thres==10:
-                                return render_template('hello.html',RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC']+". Unknown coordinates style!",ZOOM=scale)
-                            else:
-                                return render_template('hello.html',RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC']+". Unknown coordinates style!",ZOOM=scale,THRES=thres)
+                        return render_page(str_html='hello.html',RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC']+". Unknown coordinates style!",ZOOM=scale,THRES=thres)
+                        
         else:
-            if scale==1:
-                if thres==10:
-                    return render_template('hello.html',Error="Not enough info")
-                else:
-                    return render_template('hello.html',Error="Not enough info",THRES=thres)
-            else:
-                if thres==10:
-                    return render_template('hello.html',Error="Not enough info",ZOOM=scale)
-                else:
-                    return render_template('hello.html',Error="Not enough info",ZOOM=scale,THRES=thres)
+            return render_page(str_html='hello.html',Error="Not enough info",THRES=thres, ZOOM=scale)        
+            
 
     
-    return render_template('hello.html')
+    return render_template('hello.html',Error=None)
     
+    
+    
+def render_page(str_html,RA=None,DEC=None,Error=None,image=None,ZOOM=None,THRES=None,Name=None):
+    if ZOOM==1:
+        if THRES==10:
+            return render_template(str_html,RA=RA,DEC=DEC,Error=Error,Name=Name,image=image)
+        else:
+            return render_template(str_html,RA=RA,DEC=DEC,Error=Error,Name=Name,image=image,THRES=THRES)
+    else:
+        if THRES==10:
+            return render_template(str_html,RA=RA,DEC=DEC,Error=Error,Name=Name,image=image,ZOOM=ZOOM)
+        else:
+            return render_template(str_html,RA=RA,DEC=DEC,Error=Error,Name=Name,image=image,ZOOM=ZOOM,THRES=THRES)
 
 def get_ra_dec_fromString(ra_string,dec_string):
     try:
