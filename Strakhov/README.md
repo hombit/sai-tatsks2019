@@ -19,7 +19,7 @@ Out. Так же есть возможность исключить из изо�
 **Разворачивается по адресу 0.0.0.0:8888**
 
 Примеры:
-![Repo List](screenshots/1.png)
-![Repo List](screenshots/2.png)
-![Repo List](screenshots/3.png)
-![Repo List](screenshots/4.png)
+![Repo List](screenshots/1.png| width=100)
+![Repo List](screenshots/2.png| width=100)
+![Repo List](screenshots/3.png| width=100)
+![Repo List](screenshots/4.png| width=100)
