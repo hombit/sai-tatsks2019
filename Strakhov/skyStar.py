@@ -51,7 +51,7 @@ def postreq():
                             
                             c2=SkyCoord(result_table["RA_d"][0],result_table["DEC_d"][0],unit=(u.deg,u.deg),frame='icrs')
                             dist=c1.separation(c2).arcsecond
-                            return render_page(str_html='hello.html',Name=str(result_table["MAIN_ID"][0]),image="data:image/png;base64,"+ base64.b64encode(create_figure(result_table["RA_d"][0],result_table["DEC_d"][0],scale,thres)).decode("UTF-8"),RA=result_table["RA_d"][0],DEC=result_table["DEC_d"][0],Error="Star with name: "+request.form["Name"]+" not found. Execution of coordinates search.\n"+"Closest star (distance={:.2f} asec): Magnitude: {:.1f}".format(dist,result_table["FLUX_V"][0]),ZOOM=scale,THRES=thres)
+                            return render_page(str_html='hello.html',Name=result_table["MAIN_ID"][0].decode("UTF-8"),image="data:image/png;base64,"+ base64.b64encode(create_figure(result_table["RA_d"][0],result_table["DEC_d"][0],scale,thres)).decode("UTF-8"),RA=result_table["RA_d"][0],DEC=result_table["DEC_d"][0],Error="Star with name: "+request.form["Name"]+" not found. Execution of coordinates search.\n"+"Closest star (distance={:.2f} asec): Magnitude: {:.1f}".format(dist,result_table["FLUX_V"][0]),ZOOM=scale,THRES=thres)
                         else:
                             return render_page(str_html='hello.html',image="data:image/png;base64,"+ base64.b64encode(create_figure(c1.ra.deg,c1.dec.deg,scale,thres)).decode("UTF-8"),RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC'],ZOOM=scale,THRES=thres)
                                 
