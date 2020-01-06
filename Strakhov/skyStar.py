@@ -5,6 +5,7 @@ from flask import Flask, Response, render_template, request
 import requests
 from astropy.coordinates import SkyCoord
 from astropy import units as u
+import astropy.coordinates.name_resolve as astropy_name_resolve
 import makePic
 from astroquery.simbad import Simbad
 
@@ -28,74 +29,75 @@ def postreq():
         
     if validate_request():
         if request.form["Name"]!='':
-            try:
+            #### field Name is not empty ####
                 
-                result_table = simbad_object()
+            result_table = simbad_object()
+            
+            #### checking if there is object with this name ####
+            if not result_table is None:
+                return render_page(str_html='hello.html',Name=request.form['Name'],image="data:image/png;base64,"+ base64.b64encode(create_figure(result_table["RA_d"][0],result_table["DEC_d"][0],scale,thres)).decode("UTF-8"),RA=result_table["RA_d"][0],DEC=result_table["DEC_d"][0],ZOOM=scale,THRES=thres,Error="Magnitude: {:.1f}".format(result_table["FLUX_V"][0]))
+            else:
                 
-                if not result_table is None:
-                    return render_page(str_html='hello.html',Name=request.form['Name'],image="data:image/png;base64,"+ base64.b64encode(create_figure(result_table["RA_d"][0],result_table["DEC_d"][0],scale,thres)).decode("UTF-8"),RA=result_table["RA_d"][0],DEC=result_table["DEC_d"][0],ZOOM=scale,THRES=thres,Error="Magnitude: {:.1f}".format(result_table["FLUX_V"][0]))
-                else:
-                    raise ValueError
+                ### if there is no such object then search by coordinates ###
                 
-            except ValueError:
                 if request.form["RA"]!='' and request.form["DEC"]!='':
+                    
                     try:           
+                        c1=get_coord_from_string(request.form["RA"],request.form["DEC"])
+                    except astropy_name_resolve.NameResolveError:
+                        return render_page(str_html='hello.html',RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC']+". Unknown coordinates style!",ZOOM=scale,THRES=thres)
                         
-                        ra_unit,dec_unit=get_ra_dec_units_fromString(request.form["RA"],request.form["DEC"])
-                        
-                        result_table=simbad_region(ra_unit,dec_unit)
-                        
-                        c1=SkyCoord(request.form["RA"],request.form["DEC"],unit=(ra_unit,dec_unit),frame='icrs')
-                        
-                        if not result_table is None:
-                            
-                            c2=SkyCoord(result_table["RA_d"][0],result_table["DEC_d"][0],unit=(u.deg,u.deg),frame='icrs')
-                            dist=c1.separation(c2).arcsecond
-                            return render_page(str_html='hello.html',Name=result_table["MAIN_ID"][0].decode("UTF-8"),image="data:image/png;base64,"+ base64.b64encode(create_figure(result_table["RA_d"][0],result_table["DEC_d"][0],scale,thres)).decode("UTF-8"),RA=result_table["RA_d"][0],DEC=result_table["DEC_d"][0],Error="Star with name: "+request.form["Name"]+" not found. Execution of coordinates search.\n"+"Closest star (distance={:.2f} asec): Magnitude: {:.1f}".format(dist,result_table["FLUX_V"][0]),ZOOM=scale,THRES=thres)
-                        else:
-                            return render_page(str_html='hello.html',image="data:image/png;base64,"+ base64.b64encode(create_figure(c1.ra.deg,c1.dec.deg,scale,thres)).decode("UTF-8"),RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC'],ZOOM=scale,THRES=thres)
+                    result_table=simbad_region(c1)
+                    
+                    #### checking if there is object with this coordinates ####    
+                    if not result_table is None:
+                        c2=SkyCoord(result_table["RA_d"][0],result_table["DEC_d"][0],unit=(u.deg,u.deg),frame='icrs')
+                        dist=c1.separation(c2).arcsecond
+                        return render_page(str_html='hello.html',Name=result_table["MAIN_ID"][0].decode("UTF-8"),image="data:image/png;base64,"+ base64.b64encode(create_figure(result_table["RA_d"][0],result_table["DEC_d"][0],scale,thres)).decode("UTF-8"),RA=result_table["RA_d"][0],DEC=result_table["DEC_d"][0],Error="Star with name: "+request.form["Name"]+" not found. Execution of coordinates search.\n"+"Closest star (distance={:.2f} asec): Magnitude: {:.1f}".format(dist,result_table["FLUX_V"][0]),ZOOM=scale,THRES=thres)
+                    else:
+                        return render_page(str_html='hello.html',image="data:image/png;base64,"+ base64.b64encode(create_figure(c1.ra.deg,c1.dec.deg,scale,thres)).decode("UTF-8"),RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC'],ZOOM=scale,THRES=thres)
                                 
                         
-                    except ValueError:
-                        return render_page(str_html='hello.html',RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC']+". Unknown coordinates style!",ZOOM=scale,THRES=thres)
                         
                                 
                 return render_page(str_html='hello.html',Error="No data obtained about '"+request.form['Name']+"' star",ZOOM=scale,THRES=thres)
                         
 
         else:
+            #### field Name is empty ####
+            ### search by coordinates ###
             try:
-                ra_unit,dec_unit=get_ra_dec_units_fromString(request.form["RA"],request.form["DEC"])
-                result_table=simbad_region(ra_unit,dec_unit)
-                c1=SkyCoord(request.form["RA"],request.form["DEC"],unit=(ra_unit,dec_unit),frame='icrs')
+                c1=get_coord_from_string(request.form["RA"],request.form["DEC"])
+            except astropy_name_resolve.NameResolveError:
+                return render_page(str_html='hello.html',RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC']+". Unknown coordinates style!",ZOOM=scale,THRES=thres)
                 
-                if not result_table is None:
-                    c2=SkyCoord(result_table["RA_d"][0],result_table["DEC_d"][0],unit=(u.deg,u.deg),frame='icrs')
-                    dist=c1.separation(c2).arcsecond
-                    return render_page(str_html='hello.html',Name=result_table["MAIN_ID"][0].decode("UTF-8"),image="data:image/png;base64,"+ base64.b64encode(create_figure(result_table["RA_d"][0],result_table["DEC_d"][0],scale,thres)).decode("UTF-8"),RA=result_table["RA_d"][0],DEC=result_table["DEC_d"][0],Error="Closest star (distance={:.2f} asec): Magnitude: {:.1f}".format(dist,result_table["FLUX_V"][0]),ZOOM=scale,THRES=thres)
-                else:
-                    return render_page(str_html='hello.html',image="data:image/png;base64,"+ base64.b64encode(create_figure(c1.ra.deg,c1.dec.deg,scale,thres)).decode("UTF-8"),RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC'],ZOOM=scale,THRES=thres)
-                    
+            result_table=simbad_region(c1)
+            
+            #### checking if there is object with this coordinates ####    
+            if not result_table is None:
+                c2=SkyCoord(result_table["RA_d"][0],result_table["DEC_d"][0],unit=(u.deg,u.deg),frame='icrs')
+                dist=c1.separation(c2).arcsecond
+                return render_page(str_html='hello.html',Name=result_table["MAIN_ID"][0].decode("UTF-8"),image="data:image/png;base64,"+ base64.b64encode(create_figure(result_table["RA_d"][0],result_table["DEC_d"][0],scale,thres)).decode("UTF-8"),RA=result_table["RA_d"][0],DEC=result_table["DEC_d"][0],Error="Closest star (distance={:.2f} asec): Magnitude: {:.1f}".format(dist,result_table["FLUX_V"][0]),ZOOM=scale,THRES=thres)
+            else:
+                return render_page(str_html='hello.html',image="data:image/png;base64,"+ base64.b64encode(create_figure(c1.ra.deg,c1.dec.deg,scale,thres)).decode("UTF-8"),RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC'],ZOOM=scale,THRES=thres)
                 
-            except ValueError:
-                    return render_page(str_html='hello.html',RA=request.form['RA'],DEC=request.form['DEC'],Error="No data obtained for star with coordinates: "+request.form['RA']+" "+request.form['DEC']+". Unknown coordinates style!",ZOOM=scale,THRES=thres)
+                
+            
                     
     else:
+        #### required fields are not filled ###
         return render_page(str_html='hello.html',Error="Not enough info",THRES=thres, ZOOM=scale)        
         
 
     
-def simbad_region(ra_unit,dec_unit):
+def simbad_region(coord):
     customSimbad=Simbad()
     customSimbad.TIMEOUT=5
     customSimbad.add_votable_fields('ra(d)','dec(d)','flux(V)')
     customSimbad.remove_votable_fields('coordinates')
     
-    if ra_unit is None:
-        raise ValueError
-    else:
-        result_table = customSimbad.query_region(SkyCoord(request.form["RA"],request.form["DEC"],unit=(ra_unit,dec_unit),frame='icrs'), radius='0d2m0s')
-        return result_table
+    result_table = customSimbad.query_region(coord, radius='0d2m0s')
+    return result_table
                 
 def simbad_object():
     customSimbad=Simbad()
@@ -118,37 +120,24 @@ def render_page(str_html,RA=None,DEC=None,Error=None,image=None,ZOOM=None,THRES=
         else:
             return render_template(str_html,RA=RA,DEC=DEC,Error=Error,Name=Name,image=image,ZOOM=ZOOM,THRES=THRES)
 
-def get_ra_dec_units_fromString(ra_string,dec_string):
+
+def get_coord_from_string(ra_string,dec_string):
     try:
         float(ra_string)
-        ra_unit=u.deg
+        ra_string=ra_string+"d"
     except:
-        if len(ra_string.split())==3:
-            ra_unit=u.hour
-        elif len(ra_string.split(":"))==3:
-            ra_unit=u.hour
-        elif len(ra_string.split("h"))==2:
-            ra_unit=u.hour
-        elif len(ra_string.split("d"))==2:            
-            ra_unit=u.deg
-        else:
-            return None,None
+        pass
+        
     try:
         float(dec_string)
-        dec_unit=u.deg
+        dec_string=dec_string+"d"
     except:
-        if len(dec_string.split())==3:
-            dec_unit=u.deg
-        elif len(dec_string.split(":"))==3:
-            dec_unit=u.deg
-        elif len(dec_string.split("h"))==2:
-            dec_unit=u.hour
-        elif len(dec_string.split("d"))==2:            
-            dec_unit=u.deg
-        else:
-            return None,None
+        pass    
     
-    return ra_unit,dec_unit
+    try:
+        return SkyCoord(ra_string+" "+dec_string)
+    except ValueError:
+        return SkyCoord.from_name(ra_string+" "+dec_string, parse=True)
                 
 
 
