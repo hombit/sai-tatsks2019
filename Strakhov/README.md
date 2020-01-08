@@ -1,6 +1,6 @@
 Внимание!
-Программе для работы требуются следующие библиотеки: numpy, astropy,
-matplotlib, flask, skipy, cartopy.
+Программе для работы требуются следующие библиотеки: numpy, astropy, astroquery,
+matplotlib, flask, scipy, cartopy.
 Cartopy, в частности, требует наличия cython, libproj-dev, proj-data, proj-bin,
 libgeos-dev.
 
