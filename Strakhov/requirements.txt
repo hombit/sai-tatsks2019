@@ -5,4 +5,5 @@ requests
 numpy
 Shapely
 astropy
-skipy
+scipy
+astroquery
