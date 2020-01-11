@@ -10,28 +10,28 @@ months = {'1': 'January', '2': 'February', '3': 'March', '4': 'April', '5': 'May
           '8': 'August', '9': 'September', '10': 'October', '11': 'November', '12': 'December'}
 
 
-def Wiki_text(data):
-    numer = data.find('-')
-    year = data[:numer]
-    data = data[numer+1:]
-    numer = data.find('-')
-    data_final = months[data[:numer]] + ' ' + data[numer+1:]
+def Wiki_text(date):
+    numer = date.find('-')
+    year = date[:numer]
+    date = date[numer+1:]
+    numer = date.find('-')
+    date_final = months[date[:numer]] + ' ' + date[numer+1:]
     par = {
         'action': 'parse',
         'format': 'json',
-        'page': data_final,
+        'page': date_final,
         'section': '1',
     }
     text = requests.get('https://en.wikipedia.org/w/api.php', params=par).json()['parse']['text']['*']
-    return text, year + ' ' + data_final
+    return text, year + ' ' + date_final
 
 
-def NASA_photo(data):
-    par = {'earth_date': data,
+def NASA_photo(date):
+    par = {'earth_date': date,
            'api_key': NASA_API_key}
     p = requests.get('https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos', params=par).json()['photos']
     if len(p) == 0:
-        return False, data
+        return False, date
     else:
         link = p[random.randint(0, len(p) - 1)]['img_src']
         return True, link
@@ -42,17 +42,22 @@ def title_site():
     return render_template('main_site.html')
 
 
-@app.route('/<data>')
-def main_site(data):
-    textum, data_final = Wiki_text(data)
-    flag, photo_link = NASA_photo(data)
+@app.route('/favicon.ico')
+def favicon():
+    return '1'
+
+
+@app.route('/<date>')
+def main_site(date):
+    textum, date_final = Wiki_text(date)
+    flag, photo_link = NASA_photo(date)
     if flag:
         link = photo_link
         not_image = False
     else:
         link = False
         not_image = True
-    return render_template('site.html', datum='Martian news for ' + data_final,
+    return render_template('site.html', datum='Martian news for ' + date_final,
                            image=link, not_image=not_image, textx=textum)
 
 
