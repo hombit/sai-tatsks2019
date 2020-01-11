@@ -1,0 +1,16 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>{{datum}}</title>
+</head>
+<body>
+	<center> <h1>{{datum}}.</h1> </center>
+	
+	<center> {% if image%} 
+		<img src={{image}} width=50%>
+	{% endif %} </center>
+	
+	{{textx|safe}}
+</body>
+</html>
