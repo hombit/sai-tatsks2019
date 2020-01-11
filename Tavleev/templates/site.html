@@ -11,6 +11,10 @@
 		<img src={{image}} width=50%>
 	{% endif %} </center>
 	
+	<center> {% if not_image%} 
+		<h2>There is no photos from Mars at this date.</h2>
+	{% endif %} </center>
+	
 	{{textx|safe}}
 </body>
 </html>
