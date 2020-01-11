@@ -23,5 +23,6 @@ YYYY-MM-DD
 
 Пример key.txt файла:
 DEMO_KEY
+
 1995-06-25
 
