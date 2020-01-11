@@ -18,9 +18,9 @@ def main():
     response_g = requests.get('https://irsa.ipac.caltech.edu/cgi-bin/ZTF/nph_light_curves?POS=CIRCLE ' + str(RA) + ' ' + str(DEC) + ' 0.0014&BANDNAME=g')
     if response_g.status_code == 200:
         print('OK')
-        res_g = response_g.content
+        res_g = response_g.content #А json не работает
         obj_g = BytesIO(res_g)
-        table_g = parse_single_table(obj_g)
+        table_g = parse_single_table(obj_g) #А votable просит только файлы
         data_g = Table(table_g.array)
         if (len(data_g) != 0):
             objects_g = np.unique(np.array(data_g['oid']))
