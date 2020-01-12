@@ -1,7 +1,13 @@
 version: '3.2'
 
 services:
+  gcn_telegram:
+    build: Alkousa
+    volumes:
+      - ./Alkousa/handle:/app/handle:ro
+      - ./Alkousa/token:/app/token:ro
+
   gcn_discord:
     build: Balakin
     volumes:
-      - ./Balakin/discord_apikey:/app/discord_apikey
+      - ./Balakin/discord_apikey:/app/discord_apikey:ro
