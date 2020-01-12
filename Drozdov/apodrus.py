@@ -30,7 +30,7 @@ app = Flask(__name__)
 
 
 @app.route('/<api_key>/<date>/picture')
-def api_picture(api_key, date):
+def api_key_date_picture(api_key, date):
     res = gain_json(api_key,date)
     r = res[0]
     date = res[1]
@@ -86,8 +86,122 @@ def api_picture(api_key, date):
                            translate=translate)
 
 
+@app.route('/<api_key>/picture')
+def api_key_picture(api_key):
+    res = gain_json(api_key,'')
+    r = res[0]
+    date = res[1]
+    date_astro = res[2]
+
+    resp = requests.get("http://www.astronet.ru/db/apod.html?d=" + date)
+    soup = BeautifulSoup(resp.text)
+
+    date_position = soup.find(string=re.compile(date_astro))
+    if not date_position:
+        print('На дату: ' + date_astro + ' астрономической картинки дня нет.')
+        return render_template("Astronomy Picture of the Day.html", main='На дату: ' + date_astro + ' астрономической '
+                                                                                                    'картинки дня '
+                                                                                                    'нет')
+    main = date_position.parent.find_next().text
+    url = date_position.parent.find_previous().find_previous().find_previous()
+    title_rus = url.text
+    url_add = str(url)
+    url = url_add.split('\"')[1]
+    if url[:4] != 'http':
+        url = 'http://www.astronet.ru' + url
+    print(url)
+    resp = requests.get(url)
+    soup = BeautifulSoup(resp.text)
+
+    month = str(soup.find('a', href='/db/apod.html?d=' + date[:7]).parent.text)
+
+    if soup.find(string=re.compile("Пояснение:")):
+        exp_rus = str(soup.find(string=re.compile("Пояснение:")).parent.parent.text)
+        exp_pos = exp_rus.find("Пояснение:")
+        if exp_rus.find(month, exp_pos):
+            exp_rus = exp_rus[exp_pos + 10:exp_rus.find(month, exp_pos) - 4]
+        else:
+            exp_rus = exp_rus[exp_pos + 10:]
+    else:
+        title_rus = ''
+        exp_rus = 'Русский перевод отсутствует.'
+
+    if soup.find(string=re.compile("Перевод:")):
+        translate = soup.find(string=re.compile("Перевод:")).parent.find_previous().text
+    else:
+        translate = ''
+
+    if soup.find(string=re.compile("Авторы и права:")):
+        copyright_rus = soup.find(string=re.compile("Авторы и права:")).parent.text
+    else:
+        copyright_rus = ''
+
+    return render_template("Astronomy Picture of the Day.html", explanation=r.get("explanation"),
+                           explanation_rus=exp_rus,
+                           url=r.get("url"), hdurl=r.get("hdurl"), main=main, title=r.get("title"), title_rus=title_rus,
+                           date=date_astro, copyright=r.get("copyright"), copyright_rus=copyright_rus,
+                           translate=translate)
+
+
+@app.route('/picture')
+def api_picture():
+    res = gain_json('DEMO_KEY','')
+    r = res[0]
+    date = res[1]
+    date_astro = res[2]
+
+    resp = requests.get("http://www.astronet.ru/db/apod.html?d=" + date)
+    soup = BeautifulSoup(resp.text)
+
+    date_position = soup.find(string=re.compile(date_astro))
+    if not date_position:
+        print('На дату: ' + date_astro + ' астрономической картинки дня нет.')
+        return render_template("Astronomy Picture of the Day.html", main='На дату: ' + date_astro + ' астрономической '
+                                                                                                    'картинки дня '
+                                                                                                    'нет')
+    main = date_position.parent.find_next().text
+    url = date_position.parent.find_previous().find_previous().find_previous()
+    title_rus = url.text
+    url_add = str(url)
+    url = url_add.split('\"')[1]
+    if url[:4] != 'http':
+        url = 'http://www.astronet.ru' + url
+    print(url)
+    resp = requests.get(url)
+    soup = BeautifulSoup(resp.text)
+
+    month = str(soup.find('a', href='/db/apod.html?d=' + date[:7]).parent.text)
+
+    if soup.find(string=re.compile("Пояснение:")):
+        exp_rus = str(soup.find(string=re.compile("Пояснение:")).parent.parent.text)
+        exp_pos = exp_rus.find("Пояснение:")
+        if exp_rus.find(month, exp_pos):
+            exp_rus = exp_rus[exp_pos + 10:exp_rus.find(month, exp_pos) - 4]
+        else:
+            exp_rus = exp_rus[exp_pos + 10:]
+    else:
+        title_rus = ''
+        exp_rus = 'Русский перевод отсутствует.'
+
+    if soup.find(string=re.compile("Перевод:")):
+        translate = soup.find(string=re.compile("Перевод:")).parent.find_previous().text
+    else:
+        translate = ''
+
+    if soup.find(string=re.compile("Авторы и права:")):
+        copyright_rus = soup.find(string=re.compile("Авторы и права:")).parent.text
+    else:
+        copyright_rus = ''
+
+    return render_template("Astronomy Picture of the Day.html", explanation=r.get("explanation"),
+                           explanation_rus=exp_rus,
+                           url=r.get("url"), hdurl=r.get("hdurl"), main=main, title=r.get("title"), title_rus=title_rus,
+                           date=date_astro, copyright=r.get("copyright"), copyright_rus=copyright_rus,
+                           translate=translate)
+
+
 @app.route('/<api_key>/<date>')
-def api_apod_key_date(api_key, date):
+def api_key_date(api_key, date):
     res = gain_json(api_key,date)
     r = res[0]
     date = res[1]
@@ -128,7 +242,7 @@ def api_apod_key_date(api_key, date):
 
 
 @app.route('/<api_key>')
-def api_apod_key(api_key):
+def api_key(api_key):
     res = gain_json(api_key,'')
     r = res[0]
     date = res[1]
@@ -169,7 +283,7 @@ def api_apod_key(api_key):
 
 
 @app.route('/')
-def api_apod():
+def api():
     res = gain_json('DEMO_KEY','')
     r = res[0]
     date = res[1]
