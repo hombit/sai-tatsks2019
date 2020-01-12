@@ -27,7 +27,8 @@ def calc_mean(data):
             ind_start = np.where(np.array(data['oid']) == k)[0][0] #Начало и конец соответствующих одному объекту измерений
             ind_fin = np.where(np.array(data['oid']) == k)[0][-1]
             d_array = np.where(data['oid'] == k)[0] #Список индексов
-            if ind_fin - ind_start < 25: #Удаляем
+            min_mes_num = 25
+            if ind_fin - ind_start < min_mes_num: #Удаляем
                 mag = np.delete(mag, d_array)
                 magerr = np.delete(magerr, d_array)   
         b_mag = np.sum(mag/((magerr)**2))/np.sum(1/((magerr)**2)) #Считаем среднее
