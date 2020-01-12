@@ -6,4 +6,4 @@ python3 GarryPovar.py "Name"
 
 where "Name" is the name of the object - mainly cosmetic, to be used in the plots.
 
-![picture](img/SherlockOmsk.png)
+![picture](img/SherlockOmsk.jpg)
