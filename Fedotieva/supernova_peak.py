@@ -1,4 +1,5 @@
 import requests
+from requests.exceptions import HTTPError
 import json
 import numpy as np
 import argparse
@@ -36,9 +37,9 @@ SN_name = parser_args.name
 try:
 	response = requests.get('https://sne.space/astrocats/astrocats/supernovae/output/json/'+SN_name+'.json')
 	response.raise_for_status()
-except Exception as e:
-	print(e)
-	raise SystemExit
+except HTTPError as e:
+    print(f'Supernova {SN_name} is not found')
+    raise e
 
 data = response.json()
 
