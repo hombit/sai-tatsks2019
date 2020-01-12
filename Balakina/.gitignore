@@ -1,3 +1,4 @@
 apikey
 *.sublime*
 *.pdf
+.DS_STORE
