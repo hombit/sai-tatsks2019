@@ -16,7 +16,7 @@ To use this service follow the following steps:
    administrator.
 
 3. Creat a file with the name **token**, in it the API of the bot should be copied.
-4. Creat a file with the name **handle**, copy to it the Telegram channel handle.
+4. Creat a file with the name **handle**, copy to it the Telegram channel handle (including the ```@``` symbol).
 5. Creat a file with the name **proxy** and copy to it the adress of your proxy server for Telegram.
 (files in point 3 and 4 should be in the same directory as **gcn_tele.py**)
 
