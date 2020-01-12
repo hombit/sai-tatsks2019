@@ -1,0 +1,5 @@
+numpy 
+influxdb 
+datetime
+argparse
+matplotlib

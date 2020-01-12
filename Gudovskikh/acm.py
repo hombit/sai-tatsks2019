@@ -1,7 +1,23 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from influxdb import InfluxDBClient
 import datetime
+import argparse
+
+def createParser():
+	parser = argparse.ArgumentParser(prog='acm.py')
+
+	parser.add_argument ('-p', '--plot', action='store_const', const=True, default=False, 
+		help = 'make plot')
+
+	parser.add_argument ('-c', '--console', action='store_const', const=True, default=False, 
+	 help = 'print data')
+
+
+	return parser
+
+parser = createParser()
+namespace = parser.parse_args()
+
 
 client = InfluxDBClient(host='eagle.sai.msu.ru', port=80)
 base=client.get_list_database()
@@ -47,9 +63,15 @@ for i in range(N):
 
 print('parsing done')
 
-plt.plot(time_dat,sky_dat,'o')
+if namespace.console:
+	for i in range(len(time_dat)):
+		print(time_dat[i].strftime('%m.%Y'),':',int(sky_dat[i]),'h')
 
-plt.ylabel('hours of open dome')
-plt.xlabel('time')
-plt.title('KGO open dome')
-plt.show()
+if namespace.plot:
+	import matplotlib.pyplot as plt
+	plt.figure(figsize=(13,7))
+	plt.plot(time_dat,sky_dat,'o')
+	plt.ylabel('hours of open dome')
+	plt.xlabel('time')
+	plt.title('KGO open dome')
+	plt.show()
