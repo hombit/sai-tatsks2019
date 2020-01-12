@@ -45,7 +45,7 @@ def main():
     if len(sys.argv) == 1:
         RA = 298.0025
         DEC = 29.87147
-    elif len(sys.argv) == 2: 
+    elif len(sys.argv) == 3: 
         RA, DEC = sys.argv[1], sys.argv[2]
     coord = (RA, DEC)
     r_mag, rerr = calc('r', coord)
