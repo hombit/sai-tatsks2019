@@ -11,6 +11,9 @@ months = {'1': 'January', '2': 'February', '3': 'March', '4': 'April', '5': 'May
           '8': 'August', '9': 'September', '10': 'October', '11': 'November', '12': 'December'}
 
 NASA_API_key = os.environ.get('NASA_API')
+if NASA_API_key is None:
+    print('NASA_API is required for correct work of server. Enter NASA_API')
+    sys.exit(1)
 
 
 def Wiki_text(year, month, day):
@@ -49,9 +52,6 @@ def page_not_found(error):
 
 @app.route('/<date>')
 def main_site(date):
-    if NASA_API_key is None:
-        abort(Response('Enter NASA_API'))
-
     numer = date.find('-')
     if numer == -1:
         abort(404)
