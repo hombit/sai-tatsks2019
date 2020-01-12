@@ -10,18 +10,18 @@ def create_table(bandname, coord):
     response = requests.get('https://irsa.ipac.caltech.edu/cgi-bin/ZTF/nph_light_curves?POS=CIRCLE {0[0]} {0[1]} 0.00028&BANDNAME={1[0]}'.format(coord, bandname))
     if response.status_code != 200:
         print('err: {0}'.format(response.status_code))
-        return()
+        return
     print('OK')
     res = response.content
     obj = BytesIO(res)
     table = parse_single_table(obj)
     data = Table(table.array) #Полученная кривая блеска
-    return(data)
+    return data
             
 def calc_mean(data):    
     if (len(data) == 0): #Может не быть объекта по заданным координатам
         print('Нет объекта с такими координатами!')
-        return()
+        return
     objects = np.unique(np.array(data['oid'])) #Cписок ID всех объектов
     mag = np.array(data['mag']) #Нужные столбцы
     magerr = np.array(data['magerr'])
@@ -35,12 +35,12 @@ def calc_mean(data):
             magerr = np.delete(magerr, d_array)   
     b_mag = np.sum(mag/((magerr)**2))/np.sum(1/((magerr)**2)) #Считаем среднее
     err = np.sqrt(1/(np.sum(1/((magerr)**2))))
-    return(b_mag, err)
+    return b_mag, err
         
 def calc(bandname, coord):
     table = create_table(bandname, coord)
     b_mag, err = calc_mean(table)
-    return(b_mag, err)
+    return b_mag, err
 
 def main():   
     if len(sys.argv) == 1:
