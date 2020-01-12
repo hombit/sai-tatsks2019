@@ -19,3 +19,8 @@ services:
   ads_sai:
     build: Grishin
     env_file: ./Grishin/secret.env
+
+  navigator:
+    build: Strakhov
+    ports:
+      - "8001:8888"
