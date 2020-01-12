@@ -9,7 +9,7 @@ import sys
 def create_table(bandname, coord):
     response = requests.get('https://irsa.ipac.caltech.edu/cgi-bin/ZTF/nph_light_curves?POS=CIRCLE {0[0]} {0[1]} 0.00028&BANDNAME={1[0]}'.format(coord, bandname))
     if response.status_code != 200:
-        print('err: ' + str(response.status_code))
+        print('err: {0}'.format(response.status_code))
         return()
     print('OK')
     res = response.content
