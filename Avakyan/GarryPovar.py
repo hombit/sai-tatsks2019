@@ -19,16 +19,19 @@ def is_downloadable(url):
 
 def main():
 
+    nam = sys.argv[1]+ " " + sys.argv[2]
+
     diction={
     "coords":"",
-    "obname":sys.argv[1][1:-1],
+    "obname":nam,
     "outdir":"",
     "targ":"",
     "Tstart":"",
     "poserr":""
     }
-
-    print(sys.argv[1])
+    
+    print(nam)
+    print(diction["obname"])
     resp=req.get("https://www.swift.ac.uk/user_objects/details.php?oname="+diction["obname"])
     parameters =resp.text.split(';')
     print(resp.text)
@@ -54,6 +57,8 @@ def main():
     #coords=string[string.find("document.getElementById('coords').value='"):]
     #coords=coords[:coords.find("';")]
     #print(coords)
+    if diction["poserr"]=='':
+        diction["poserr"]='1'
 
     data = {
     'lc':'on',
