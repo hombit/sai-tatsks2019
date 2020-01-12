@@ -1,4 +1,3 @@
-import json
 import sys
 import requests as req
 from bs4 import BeautifulSoup
@@ -6,7 +5,6 @@ from bs4 import BeautifulSoup
 import time
 
 
-URL = 'https://www.swift.ac.uk/user_objects'
 
 def is_downloadable(url):
     """
