@@ -1,10 +1,10 @@
-#libraries:
+libraries:
 
-**pygcn**
-**python-telegram-proxy**
-**logging**
-**datetime**
+pygcn
+python-telegram-proxy
+logging
+datetime
 
-#Prerequisites:
+Prerequisites:
 
-Proxy server for Telegram (e.g. **Socks5** server)
+Proxy server for Telegram (e.g. Socks5 server)
