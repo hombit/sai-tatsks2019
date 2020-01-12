@@ -65,7 +65,7 @@ def gcn_handler(payload, root):
     except AttributeError:
         print("no coords")
         msg = msg + '\nNo coord data'
-    send(msg, '@g_c_n_alert', my_token)
+    send(msg, my_handle, my_token)
 
 
 if __name__ == "__main__":
