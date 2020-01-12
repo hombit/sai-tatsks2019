@@ -30,3 +30,9 @@ services:
     ports:
       - "8002:8888"
     env_file: ./Tavleev/secret.env
+
+  kgo_weather_darksky:
+    build: Zheltoukhov
+    volumes:
+      - ./Zheltoukhov/weather.dat:/app/weather.dat
+      - ./Zheltoukhov/key.txt:/app/key.txt:ro
