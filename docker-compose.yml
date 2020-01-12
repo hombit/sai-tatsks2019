@@ -24,3 +24,9 @@ services:
     build: Strakhov
     ports:
       - "8001:8888"
+
+  marsian_news:
+    build: Tavleev
+    ports:
+      - "8002:5000"
+    env_file: ./Tavleev/secret.env
