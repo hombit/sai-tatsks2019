@@ -22,7 +22,7 @@ namespace = parser.parse_args()
 client = InfluxDBClient(host='eagle.sai.msu.ru', port=80)
 base=client.get_list_database()
 #print(base)
-response = client.query('SELECT * FROM "mass.seeing" WHERE time > now() - 365d; ',database='taxandria')
+response = client.query('SELECT * FROM "mass.seeing" WHERE time > now() -365d AND type = \'profile\'; ',database='taxandria')
 
 print('response done')
 
@@ -31,9 +31,6 @@ data_list = list(response)[0]
 time_array=[]
 
 for point in data_list:
-	if point['type']!='profile':
-		continue
-
 	point_time = datetime.datetime.strptime(point['time'],'%Y-%m-%dT%H:%M:%SZ')
 	time_array.append(point_time)
 
@@ -69,9 +66,11 @@ if namespace.console:
 
 if namespace.plot:
 	import matplotlib.pyplot as plt
-	plt.figure(figsize=(13,7))
+	plt.xticks(rotation=45)
+#	plt.figure(figsize=(13,7))
 	plt.plot(time_dat,sky_dat,'o')
 	plt.ylabel('hours of open dome')
 	plt.xlabel('time')
 	plt.title('KGO open dome')
+	plt.tight_layout()
 	plt.show()
