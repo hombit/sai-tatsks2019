@@ -1,9 +1,9 @@
 libraries:
-
+```
 pygcn
 python-telegram-bot
-logging
-datetime
+urllib3
+```
 
 Prerequisites:
 
