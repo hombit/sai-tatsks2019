@@ -4,8 +4,6 @@ from bs4 import BeautifulSoup
 
 import time
 
-
-
 def is_downloadable(url):
     """
     Does the url contain a downloadable resource
