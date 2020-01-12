@@ -4,11 +4,16 @@ import sys
 import datetime
 
 import requests
-from flask import Flask, render_template, abort
+from flask import Flask, render_template, abort, Response
 
 app = Flask(__name__)
 months = {'1': 'January', '2': 'February', '3': 'March', '4': 'April', '5': 'May', '6': 'June', '7': 'July',
           '8': 'August', '9': 'September', '10': 'October', '11': 'November', '12': 'December'}
+
+NASA_API_key = os.environ.get('NASA_API')
+if NASA_API_key is None:
+    print('NASA_API is required for correct work of server. Enter NASA_API')
+    sys.exit(1)
 
 
 def Wiki_text(year, month, day):
@@ -75,9 +80,4 @@ def main_site(date):
 
 
 if __name__ == '__main__':
-    NASA_API_key = os.environ.get('NASA_API')
-    if NASA_API_key is not None:
-        app.run('0.0.0.0', 5000)
-    else:
-        print('Enter NASA_API')
-        sys.exit(1)
+    app.run('0.0.0.0', 5000)
