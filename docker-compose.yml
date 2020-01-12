@@ -28,5 +28,5 @@ services:
   marsian_news:
     build: Tavleev
     ports:
-      - "8002:5000"
+      - "8002:8888"
     env_file: ./Tavleev/secret.env
