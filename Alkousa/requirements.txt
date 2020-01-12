@@ -1,0 +1,3 @@
+pygcn
+python-telegram-bot[socks]
+urllib3[socks]
