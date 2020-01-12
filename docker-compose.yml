@@ -12,6 +12,10 @@ services:
     volumes:
       - ./Balakin/discord_apikey:/app/discord_apikey:ro
 
+  sn_peak:
+    build: Fedotieva
+    command: ["SN2017eye"]
+
   ads_sai:
     build: Grishin
     env_file: ./Grishin/secret.env
