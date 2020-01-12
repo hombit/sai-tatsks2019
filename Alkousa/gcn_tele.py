@@ -5,6 +5,13 @@ import telegram
 import datetime as dt
 
 try:
+    with open('./handle') as f:
+        my_handle = f.read().strip()
+except OSError:
+    print('no handle, can\'t work')
+    exit(1)
+
+try:
     with open('./token') as f:
         my_token = f.read().strip()
 except OSError:
@@ -63,5 +70,5 @@ def gcn_handler(payload, root):
 
 if __name__ == "__main__":
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-    send('GCN Alert system starting at {now}'.format(now=dt.datetime.now().isoformat()), '@g_c_n_alert', my_token)
+    send('GCN Alert system starting at {now}'.format(now=dt.datetime.now().isoformat()), my_handle, my_token)
     gcn.listen(handler=gcn_handler)
