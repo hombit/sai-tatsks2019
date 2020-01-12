@@ -4,6 +4,6 @@ The program is launched through a command such as:
 
 python3 GarryPovar.py "Name"
 
-where "Name" is the name of the object - mainly cosmetic, to be used in the find of the object
+where "Name" is the name of the object - mainly cosmetic, to be used in the finding of the object
 
 ![picture](img/SherlockOmsk.jpg)
