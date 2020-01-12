@@ -30,9 +30,9 @@ def main():
 
     print(sys.argv[1])
     resp=req.get("https://www.swift.ac.uk/user_objects/details.php?oname="+diction["obname"])
-    thread =resp.text.split(';')
+    parameters =resp.text.split(';')
     print(resp.text)
-    for i in thread:
+    for i in parameters:
         for j in diction:
             if j in i.split("=")[0]:
                 diction[j]=i.split("=")[1][1:-1]
