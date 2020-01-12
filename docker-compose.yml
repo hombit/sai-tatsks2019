@@ -1,0 +1,7 @@
+version: '3.2'
+
+services:
+  gcn_discord:
+    build: Balakin
+    volumes:
+      - ./Balakin/discord_apikey:/app/discord_apikey
