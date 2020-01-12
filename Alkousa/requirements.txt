@@ -1,7 +1,7 @@
 libraries:
 
 pygcn
-python-telegram-proxy
+python-telegram-bot
 logging
 datetime
 
