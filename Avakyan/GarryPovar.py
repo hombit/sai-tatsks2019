@@ -30,9 +30,9 @@ def main():
 
     print(sys.argv[1])
     resp=req.get("https://www.swift.ac.uk/user_objects/details.php?oname="+diction["obname"])
-    string=resp.text.split(';')
+    thread =resp.text.split(';')
     print(resp.text)
-    for i in string:
+    for i in thread:
         for j in diction:
             if j in i.split("=")[0]:
                 diction[j]=i.split("=")[1][1:-1]
@@ -120,8 +120,9 @@ def main():
     while(True):
         time.sleep(10.0)
         resp = req.get("https://www.swift.ac.uk/user_objects/tprods/"+diction["outdir"]+"/index.php")
-        print(BeautifulSoup(resp.text, 'lxml').find("title").text.strip())
-        if BeautifulSoup(resp.text, 'lxml').find("title").text.strip().split()[2]=="COMPLETE:":
+        qeqr = BeautifulSoup(resp.text, 'lxml').find("title").text.strip()
+        print(qeqr)
+        if 'COMPLETE' in qeqr:
             break
             
     print("to see results please visit: "+"https://www.swift.ac.uk/user_objects/tprods/"+diction["outdir"]+"/lc/index.php")
@@ -143,11 +144,12 @@ def main():
             if is_downloadable(link):
                 print("downloading")
                 if downl.find('/'):
-
+     
                     print("downloading "+filename)
                     r = req.get(link, allow_redirects=True)
-                    open(filename, 'wb').write(r.content)
-
+                    with open(filename, 'wb') as file_result:
+                        file_result.write(r.content)
+                    
 
 if __name__ == '__main__':
     main()
