@@ -20,6 +20,9 @@ services:
     build: Grishin
     env_file: ./Grishin/secret.env
 
+  ztf_color:
+    build: Podzolkova
+
   navigator:
     build: Strakhov
     ports:
