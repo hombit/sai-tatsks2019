@@ -9,21 +9,21 @@ def get_lightcurve(band, name):
     
     length = len(name)
     
-    dirfile = "http://ogledb.astrouw.edu.pl/~ogle/CVS/data/{}/{}/".format(band, name[length - 2] + name[length-1])
+    url = "http://ogledb.astrouw.edu.pl/~ogle/CVS/data/{}/{}/{}{}".format(band, name[-3:], name, ".dat")
 
-    fullpath = dirfile + name + ".dat"
-
-    filereq = requests.get(fullpath)
+    filereq = requests.get(url)
 
     lightcurve = filereq.text
 
     dir = "data"
+
+    filename = "{}-{}.csv".format(name, band)
     
     os.makedirs(dir, exist_ok=True)
-    
-    filename = "{}-{}.csv".format(name, band)
 
-    with open(dir.filename, "wt") as file:
+    os.path.join(dir, filename)
+    
+    with open(filename, "wt") as file:
 
         file.write("HJD-2450000   mag  err")
 
