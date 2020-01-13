@@ -8,4 +8,6 @@ RUN pip install -r requirements.txt
 
 COPY . /app/
 
+VOLUME /app/data
+
 ENTRYPOINT ["python", "GarryPovar.py"]

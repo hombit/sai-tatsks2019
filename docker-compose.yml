@@ -11,6 +11,8 @@ services:
     build: Avakyan
     # Works extremely long with valid objects
     command: ["TEST_TEST_TEST"] # ["GRB 171222A"]
+    volumes:
+      - ./Avakyan/data:/app/data
 
   gcn_discord:
     build: Balakin
