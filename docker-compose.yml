@@ -19,6 +19,13 @@ services:
     volumes:
       - ./Balakin/discord_apikey:/app/discord_apikey:ro
 
+  ads_trends:
+    build: Balakina
+    command: ["supernova"]
+    volumes:
+      - ./Balakina/Trends.png:/app/Trends.png
+    env_file: ./Balakina/secret.env
+
   ogle_light_curve:
     build: Bekesov
     volumes:
