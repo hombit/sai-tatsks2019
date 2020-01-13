@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rc, rcParams
+import calendar
 
 rcParams['font.size'] = 14
 rcParams['xtick.direction'] = 'in'
@@ -59,11 +60,14 @@ def main():
     x = np.array(dt_list)
     df = pd.DataFrame({'x': x.astype('datetime64')})
     fig, ax = plt.subplots()
-    df.groupby([df['x'].dt.year, df['x'].dt.month]).count().plot(kind='bar', color='#4e79a7', ax=ax, legend=False)
+    group = df.groupby([df['x'].dt.year, df['x'].dt.month]).count()
+    str_index = ['{month} {year}'.format(month=calendar.month_abbr[key[1]], year=key[0]) for key in group.index]
+    group.plot(kind='bar', color='#4e79a7', ax=ax, legend=False)
     fig.subplots_adjust(left=.15, bottom=.25, right=.95, top=.95)
     ax.yaxis.set_minor_locator(plt.MultipleLocator(1))
     plt.xlabel('Date')
     plt.ylabel('Number of papers')
+    ax.set_xticklabels(str_index)
     plt.setp(ax.get_xticklabels(), rotation=55)
     plt.show()
 
