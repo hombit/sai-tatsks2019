@@ -1,4 +1,5 @@
 import sys
+import os
 import requests as req
 from bs4 import BeautifulSoup
 
@@ -138,6 +139,9 @@ def main():
     print("to see results please visit: "+"https://www.swift.ac.uk/user_objects/tprods/"+diction["outdir"]+"/lc/index.php")
     resp = req.get("https://www.swift.ac.uk/user_objects/tprods/"+diction["outdir"]+"/lc/index.php")
     soup=BeautifulSoup(resp.text, 'lxml')
+    
+    os.makedirs('./data', exist_ok = True)
+
 
     for a in soup.find_all('a',href=True):
         #print("Download file url:", a['href'])
@@ -147,7 +151,7 @@ def main():
             try:
                 filename=downl.rsplit('/', 1)[1]
                 link=downl
-            except:
+            except IndexError::
                 filename=downl
                 link="https://www.swift.ac.uk/user_objects/tprods/"+diction["outdir"]+"/lc/"+filename
 
@@ -157,7 +161,8 @@ def main():
      
                     print("downloading "+filename)
                     r = req.get(link, allow_redirects=True)
-                    with open(filename, 'wb') as file_result:
+                    pat = os.path.join('./data', filename)
+                    with open(pat, 'wb') as file_result:
                         file_result.write(r.content)
                     
 
