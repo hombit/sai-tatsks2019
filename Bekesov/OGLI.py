@@ -21,7 +21,7 @@ def get_lightcurve(band, name):
     
     os.makedirs(dir, exist_ok=True)
 
-    os.path.join(dir, filename)
+    filename = os.path.join(dir, filename)
     
     with open(filename, "wt") as file:
 
