@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-from flask import Flask, render_template
+import os
+from flask import Flask, render_template, send_from_directory
 from bs4 import BeautifulSoup
 import re
 import requests
@@ -28,6 +28,12 @@ def gain_json(api_key, date):
 
 
 app = Flask(__name__)
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 @app.route('/<api_key>/<date>/picture')
@@ -94,6 +100,9 @@ def api_picture():
 
 @app.route('/<api_key>/<date>')
 def api_key_date(api_key, date):
+    print(api_key)
+    if api_key == 'favicon.ico':
+        return favicon()
     r, date, date_astro = gain_json(api_key, date)
 
     resp = requests.get(f'http://www.astronet.ru/db/apod.html?d={date}')
@@ -130,8 +139,18 @@ def api_key_date(api_key, date):
     return r
 
 
+@app.route('/<api_key>/<date>/')
+def api_key_date_s(api_key, date):
+    return api_key_date(api_key, date)
+
+
 @app.route('/<api_key>')
-def api_key(api_key):
+def api_key_(api_key):
+    return api_key_date(api_key, '')
+
+
+@app.route('/<api_key>/')
+def api_key_s(api_key):
     return api_key_date(api_key, '')
 
 
