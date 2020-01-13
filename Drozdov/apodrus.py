@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
-from flask import Flask, render_template, send_from_directory
+
+from flask import Flask, render_template
 from bs4 import BeautifulSoup
 import re
 import requests
@@ -28,12 +28,6 @@ def gain_json(api_key, date):
 
 
 app = Flask(__name__)
-
-
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 @app.route('/<api_key>/<date>/picture')
