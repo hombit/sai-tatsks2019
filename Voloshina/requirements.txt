@@ -1,5 +1,5 @@
 Django
+numpy
 astroplan
-base64
-io
+matplotlib
 astropy
