@@ -33,10 +33,10 @@ except OSError:
 
 def parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-k', '--keyword', type=str, default=False,
+    parser.add_argument('keyword', type=str,
                         help='Keyword to search NASA ADS')
-    parser.add_argument('-p', '--pages', default=3, type=int,
-                        help='Max pages to seach, default 3. Uses API Key daily quota(max 5000/day)')
+    parser.add_argument('-p', '--pages', default=15, type=int,
+                        help='Max pages to seach, default 15. Uses API Key daily quota (max 5000/day)')
     parser.add_argument('-d', '--days', default=365, type=int,
                         help='Max days to search since today(backwards, default 365)')
 
