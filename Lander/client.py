@@ -36,8 +36,7 @@ def form_file_request(filename, args={}):
     f.close()
     return (headers, data)
 
-
-if __name__ == '__main__':
+def main(argv):
 	try:
 	    with open("key") as key_file:
 	        key = key_file.readline()
@@ -48,9 +47,9 @@ if __name__ == '__main__':
 
 	print("Connectig to server...")
 	try:
-	    R = json.loads(requests.post('http://nova.astrometry.net/api/login', 
-	    	                         data={'request-json': json.dumps({"apikey": key})}).text)
-	except:
+	    R = requests.post('https://nova.astrometry.net/api/login', 
+	    	              data={'request-json': json.dumps({"apikey": key})}).json()
+	except requests.RequestException:
 	    print("Can't connect to server")
 	    sys.exit(0)
 
@@ -64,15 +63,21 @@ if __name__ == '__main__':
 	print("Session id is ", session)
 
 	args = {"session": session}
+	# try:
+	# 	files = {'file': (argv[1], open(argv[1], 'rb'), 'multipart/form-data', args)}
+	# except IOError:
+	# 	print('File %s does not exist' % argv[1])
+	# 	sys.exit(0)
 
-	file_req = form_file_request(sys.argv[1], args=args)
+	file_req = form_file_request(argv[1], args=args)
 
 	print("Uploading file...")
 	try:
-	    R2 = json.loads(requests.post('http://nova.astrometry.net/api/upload',
-	                                  data=file_req[1], headers=file_req[0]).text)
-	    
-	except:
+	    R2 = requests.post('http://nova.astrometry.net/api/upload',
+	                                  data=file_req[1], headers=file_req[0]).json()
+	    # R2 = json.loads(requests.post('http://nova.astrometry.net/api/upload',
+	    #                               files=files).text)
+	except requests.RequestException:
 	    print("Connection error")
 	    sys.exit(0)
 
@@ -90,9 +95,9 @@ if __name__ == '__main__':
 
 	while (nerrors < 10):
 	    try:
-	        R2D = json.loads(requests.get('http://nova.astrometry.net/api/submissions/'
-	                                      + str(subid)).text)
-	    except:
+	        R2D = requests.get('http://nova.astrometry.net/api/submissions/'
+	                            + str(subid)).json()
+	    except requests.RequestException:
 	        nerrors += 1
 	        print("Connection error ", nerrors)
 	    else:
@@ -116,9 +121,9 @@ if __name__ == '__main__':
 
 	job = R2D["jobs"][0]
 	try:
-	    R2D2 = json.loads(requests.get('http://nova.astrometry.net/api/jobs/' 
-	    	                           + str(job) + '/calibration').text)
-	except:
+	    R2D2 = requests.get('http://nova.astrometry.net/api/jobs/' 
+	    	                           + str(job) + '/calibration').json()
+	except requests.RequestException:
 	    print("Cant't obtain calibration data")
 	    sys.exit(0)
 	    
@@ -135,3 +140,7 @@ if __name__ == '__main__':
 	print('Image width: ', w)
 	print('Image height ', h)
 	print()
+
+
+if __name__ == '__main__':
+	sys.exit(main(sys.argv))
