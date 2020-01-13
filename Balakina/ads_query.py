@@ -26,7 +26,7 @@ rc('xtick.minor', size=0)
 rc('ytick.minor', size=3, width=1)
 
 
-def draw_plot(dt_list):
+def make_plot(dt_list, save):
     x = np.array(dt_list)
     df = pd.DataFrame({'x': x.astype('datetime64')})
     fig, ax = plt.subplots()
@@ -38,7 +38,10 @@ def draw_plot(dt_list):
     plt.ylabel('Number of papers')
     ax.set_xticklabels(str_index)
     plt.setp(ax.get_xticklabels(), rotation=55)
-    plt.show()
+    if save is True:
+        plt.savefig('Trends.png')
+    else:
+        plt.show()
 
 
 def read_apikey():
@@ -59,6 +62,8 @@ def parser():
                         help='Keyword to search NASA ADS')
     parser.add_argument('-d', '--days', default=365, type=int,
                         help='Max days to search since today (backwards, default 365)')
+    parser.add_argument('-s', '--save', default=False, action='store_true',
+                        help='Draw the plot or save it as file.png')
 
     return parser
 
@@ -87,7 +92,7 @@ def main():
                             fl=['id', 'bibcode', 'title', 'citation_count', 'pubdate'], sort='pubdate desc', rows=2000, max_pages=need_pages)
 
     append_next(q, dt_list)
-    draw_plot(dt_list)
+    make_plot(dt_list, args.save)
 
 
 if __name__ == "__main__":
