@@ -139,7 +139,8 @@ def main():
     print("to see results please visit: "+"https://www.swift.ac.uk/user_objects/tprods/"+diction["outdir"]+"/lc/index.php")
     resp = req.get("https://www.swift.ac.uk/user_objects/tprods/"+diction["outdir"]+"/lc/index.php")
     soup=BeautifulSoup(resp.text, 'lxml')
-    os.mkdir('/data')
+    
+    os.makedirs('./data', exist_ok = True)
 
 
     for a in soup.find_all('a',href=True):
@@ -160,6 +161,7 @@ def main():
      
                     print("downloading "+filename)
                     r = req.get(link, allow_redirects=True)
+                    a = os.path.join[]
                     with open('/data/' + filename, 'wb') as file_result:
                         file_result.write(r.content)
                     
