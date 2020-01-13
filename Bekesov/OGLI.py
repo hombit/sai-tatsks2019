@@ -1,19 +1,25 @@
 import requests
+import sys
+import csv
 
-file = input("Enter the catalog name of the star") + ".dat"
+name = sys.argv[2]
 
-length = len(file)
+length = len(name)
 
-band = input("Enter the band of observations")
+band = sys.argv[1]
 
-dirfile = "http://ogledb.astrouw.edu.pl/~ogle/CVS/data/" + band + "/" + file[length-6] + file[length-5] + "/"
+dirfile = "http://ogledb.astrouw.edu.pl/~ogle/CVS/data/{}/{}/".format(band, name[length - 2] + name[length-1])
 
-fullpath = dirfile + file
+fullpath = dirfile + name + ".dat"
 
 filereq = requests.get(fullpath)
 
 lightcurve = filereq.text
 
-newfile = open(file, "wt")
+with open(name + ".csv", "wt") as file:
 
-newfile.write(lightcurve)
+       file.write("HJD-2450000   mag  err")
+
+       file.write("\n")
+
+       file.write(lightcurve)

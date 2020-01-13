@@ -5,7 +5,7 @@ setup(
     name='OGLI',
     version='1.0',
     test_suite='Test',
-    py_modules = ["OGlI"],
-    install_requires=['requests', 'bs4', 'lxml', 'numpy'],
+    scripts = ["OGlI"],
+    install_requires=['requests', 'sys'],
     long_description=open(join(dirname(__file__), 'README.txt')).read(),
 )
