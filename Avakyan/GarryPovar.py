@@ -37,6 +37,8 @@ def main():
     parameters =resp.text.split(';')
     print(resp.text)
     for part in parameters:
+        if "=" not in part:
+            continue
         field, value = part.split("=")
         if field not in fields:
             continue
