@@ -1,4 +1,5 @@
 key
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -130,4 +131,3 @@ dmypy.json
 .pyre/
 *.log
 */*.png
-discord_apikey

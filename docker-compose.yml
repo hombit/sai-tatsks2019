@@ -61,6 +61,11 @@ services:
       - "8002:8888"
     env_file: ./Tavleev/secret.env
 
+  kgo_plan:
+    build: Voloshina
+    ports:
+      - "8003:8888"
+
   kgo_weather_darksky:
     build: Zheltoukhov
     volumes:
