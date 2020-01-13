@@ -9,10 +9,11 @@ import requests
 
 def gain_json(api_key, date):
     res = []
+    print(api_key)
     if not api_key:
         api_key = 'DEMO_KEY'
-#    print('https://api.nasa.gov/planetary/apod?api_key=' + api_key + '&date=' + date)
-    r = requests.get('https://api.nasa.gov/planetary/apod?api_key=' + api_key + '&date=' + date).json()
+    print(f'https://api.nasa.gov/planetary/apod?api_key={api_key}&date={date}')
+    r = requests.get(f'https://api.nasa.gov/planetary/apod?api_key={api_key}&date={date}').json()
 
     if not date:
         date = r["date"]
@@ -31,20 +32,15 @@ app = Flask(__name__)
 
 @app.route('/<api_key>/<date>/picture')
 def api_key_date_picture(api_key, date):
-    res = gain_json(api_key,date)
-    r = res[0]
-    date = res[1]
-    date_astro = res[2]
+    r, date, date_astro = gain_json(api_key, date)
 
-    resp = requests.get("http://www.astronet.ru/db/apod.html?d=" + date)
+    resp = requests.get(f'http://www.astronet.ru/db/apod.html?d={date}')
     soup = BeautifulSoup(resp.text)
 
     date_position = soup.find(string=re.compile(date_astro))
     if not date_position:
-        print('На дату: ' + date_astro + ' астрономической картинки дня нет.')
-        return render_template("Astronomy Picture of the Day.html", main='На дату: ' + date_astro + ' астрономической '
-                                                                                                    'картинки дня '
-                                                                                                    'нет')
+        return render_template('error404.html'), 404
+
     main = date_position.parent.find_next().text
     url = date_position.parent.find_previous().find_previous().find_previous()
     title_rus = url.text
@@ -56,15 +52,15 @@ def api_key_date_picture(api_key, date):
     resp = requests.get(url)
     soup = BeautifulSoup(resp.text)
 
-    month = str(soup.find('a', href='/db/apod.html?d=' + date[:7]).parent.text)
+    month = str(soup.find('a', href=f'/db/apod.html?d={date[:7]}').parent.text)
 
     if soup.find(string=re.compile("Пояснение:")):
         exp_rus = str(soup.find(string=re.compile("Пояснение:")).parent.parent.text)
         exp_pos = exp_rus.find("Пояснение:")
         if exp_rus.find(month, exp_pos):
-            exp_rus = exp_rus[exp_pos + 10:exp_rus.find(month, exp_pos) - 4]
+            exp_rus = exp_rus[exp_pos + len("Пояснение:"):exp_rus.find(month, exp_pos) - 4]
         else:
-            exp_rus = exp_rus[exp_pos + 10:]
+            exp_rus = exp_rus[exp_pos + len("Пояснение:"):]
     else:
         title_rus = ''
         exp_rus = 'Русский перевод отсутствует.'
@@ -88,132 +84,25 @@ def api_key_date_picture(api_key, date):
 
 @app.route('/<api_key>/picture')
 def api_key_picture(api_key):
-    res = gain_json(api_key,'')
-    r = res[0]
-    date = res[1]
-    date_astro = res[2]
-
-    resp = requests.get("http://www.astronet.ru/db/apod.html?d=" + date)
-    soup = BeautifulSoup(resp.text)
-
-    date_position = soup.find(string=re.compile(date_astro))
-    if not date_position:
-        print('На дату: ' + date_astro + ' астрономической картинки дня нет.')
-        return render_template("Astronomy Picture of the Day.html", main='На дату: ' + date_astro + ' астрономической '
-                                                                                                    'картинки дня '
-                                                                                                    'нет')
-    main = date_position.parent.find_next().text
-    url = date_position.parent.find_previous().find_previous().find_previous()
-    title_rus = url.text
-    url_add = str(url)
-    url = url_add.split('\"')[1]
-    if url[:4] != 'http':
-        url = 'http://www.astronet.ru' + url
-    print(url)
-    resp = requests.get(url)
-    soup = BeautifulSoup(resp.text)
-
-    month = str(soup.find('a', href='/db/apod.html?d=' + date[:7]).parent.text)
-
-    if soup.find(string=re.compile("Пояснение:")):
-        exp_rus = str(soup.find(string=re.compile("Пояснение:")).parent.parent.text)
-        exp_pos = exp_rus.find("Пояснение:")
-        if exp_rus.find(month, exp_pos):
-            exp_rus = exp_rus[exp_pos + 10:exp_rus.find(month, exp_pos) - 4]
-        else:
-            exp_rus = exp_rus[exp_pos + 10:]
-    else:
-        title_rus = ''
-        exp_rus = 'Русский перевод отсутствует.'
-
-    if soup.find(string=re.compile("Перевод:")):
-        translate = soup.find(string=re.compile("Перевод:")).parent.find_previous().text
-    else:
-        translate = ''
-
-    if soup.find(string=re.compile("Авторы и права:")):
-        copyright_rus = soup.find(string=re.compile("Авторы и права:")).parent.text
-    else:
-        copyright_rus = ''
-
-    return render_template("Astronomy Picture of the Day.html", explanation=r.get("explanation"),
-                           explanation_rus=exp_rus,
-                           url=r.get("url"), hdurl=r.get("hdurl"), main=main, title=r.get("title"), title_rus=title_rus,
-                           date=date_astro, copyright=r.get("copyright"), copyright_rus=copyright_rus,
-                           translate=translate)
+    return api_key_date_picture(api_key, '')
 
 
 @app.route('/picture')
 def api_picture():
-    res = gain_json('DEMO_KEY','')
-    r = res[0]
-    date = res[1]
-    date_astro = res[2]
-
-    resp = requests.get("http://www.astronet.ru/db/apod.html?d=" + date)
-    soup = BeautifulSoup(resp.text)
-
-    date_position = soup.find(string=re.compile(date_astro))
-    if not date_position:
-        print('На дату: ' + date_astro + ' астрономической картинки дня нет.')
-        return render_template("Astronomy Picture of the Day.html", main='На дату: ' + date_astro + ' астрономической '
-                                                                                                    'картинки дня '
-                                                                                                    'нет')
-    main = date_position.parent.find_next().text
-    url = date_position.parent.find_previous().find_previous().find_previous()
-    title_rus = url.text
-    url_add = str(url)
-    url = url_add.split('\"')[1]
-    if url[:4] != 'http':
-        url = 'http://www.astronet.ru' + url
-    print(url)
-    resp = requests.get(url)
-    soup = BeautifulSoup(resp.text)
-
-    month = str(soup.find('a', href='/db/apod.html?d=' + date[:7]).parent.text)
-
-    if soup.find(string=re.compile("Пояснение:")):
-        exp_rus = str(soup.find(string=re.compile("Пояснение:")).parent.parent.text)
-        exp_pos = exp_rus.find("Пояснение:")
-        if exp_rus.find(month, exp_pos):
-            exp_rus = exp_rus[exp_pos + 10:exp_rus.find(month, exp_pos) - 4]
-        else:
-            exp_rus = exp_rus[exp_pos + 10:]
-    else:
-        title_rus = ''
-        exp_rus = 'Русский перевод отсутствует.'
-
-    if soup.find(string=re.compile("Перевод:")):
-        translate = soup.find(string=re.compile("Перевод:")).parent.find_previous().text
-    else:
-        translate = ''
-
-    if soup.find(string=re.compile("Авторы и права:")):
-        copyright_rus = soup.find(string=re.compile("Авторы и права:")).parent.text
-    else:
-        copyright_rus = ''
-
-    return render_template("Astronomy Picture of the Day.html", explanation=r.get("explanation"),
-                           explanation_rus=exp_rus,
-                           url=r.get("url"), hdurl=r.get("hdurl"), main=main, title=r.get("title"), title_rus=title_rus,
-                           date=date_astro, copyright=r.get("copyright"), copyright_rus=copyright_rus,
-                           translate=translate)
+    return api_key_date_picture('DEMO_KEY', '')
 
 
 @app.route('/<api_key>/<date>')
 def api_key_date(api_key, date):
-    res = gain_json(api_key,date)
-    r = res[0]
-    date = res[1]
-    date_astro = res[2]
+    r, date, date_astro = gain_json(api_key, date)
 
-    resp = requests.get("http://www.astronet.ru/db/apod.html?d=" + date)
+    resp = requests.get(f'http://www.astronet.ru/db/apod.html?d={date}')
     soup = BeautifulSoup(resp.text)
 
     date_position = soup.find(string=re.compile(date_astro))
 
     if not date_position:
-        return 'На дату: ' + date_astro + ' астрономической картинки дня нет.'
+        return render_template('error404.html'), 404
 
     url = date_position.parent.find_previous().find_previous().find_previous()
     r['title'] = str(url.text).strip()
@@ -224,15 +113,15 @@ def api_key_date(api_key, date):
     resp = requests.get(url)
     soup = BeautifulSoup(resp.text)
 
-    month = str(soup.find('a', href='/db/apod.html?d=' + date[:7]).parent.text)
+    month = str(soup.find('a', href=f'/db/apod.html?d={date[:7]}').parent.text)
 
     if soup.find(string=re.compile("Пояснение:")):
         exp_rus = str(soup.find(string=re.compile("Пояснение:")).parent.parent.text)
         exp_pos = exp_rus.find("Пояснение:")
         if exp_rus.find(month, exp_pos):
-            exp_rus = exp_rus[exp_pos + 10:exp_rus.find(month, exp_pos) - 4]
+            exp_rus = exp_rus[exp_pos + len("Пояснение:"):exp_rus.find(month, exp_pos) - 4]
         else:
-            exp_rus = exp_rus[exp_pos + 10:]
+            exp_rus = exp_rus[exp_pos + len("Пояснение:"):]
         r['explanation'] = exp_rus.strip()
 
     if soup.find(string=re.compile("Авторы и права:")):
@@ -243,84 +132,12 @@ def api_key_date(api_key, date):
 
 @app.route('/<api_key>')
 def api_key(api_key):
-    res = gain_json(api_key,'')
-    r = res[0]
-    date = res[1]
-    date_astro = res[2]
-
-    resp = requests.get("http://www.astronet.ru/db/apod.html?d=" + date)
-    soup = BeautifulSoup(resp.text)
-
-    date_position = soup.find(string=re.compile(date_astro))
-
-    if not date_position:
-        return 'На дату: ' + date_astro + ' астрономической картинки дня нет.'
-
-    url = date_position.parent.find_previous().find_previous().find_previous()
-    r['title'] = str(url.text).strip()
-    url_add = str(url)
-    url = url_add.split('\"')[1]
-    if url[:4] != 'http':
-        url = 'http://www.astronet.ru' + url
-    resp = requests.get(url)
-    soup = BeautifulSoup(resp.text)
-
-    month = str(soup.find('a', href='/db/apod.html?d=' + date[:7]).parent.text)
-
-    if soup.find(string=re.compile("Пояснение:")):
-        exp_rus = str(soup.find(string=re.compile("Пояснение:")).parent.parent.text)
-        exp_pos = exp_rus.find("Пояснение:")
-        if exp_rus.find(month, exp_pos):
-            exp_rus = exp_rus[exp_pos + 10:exp_rus.find(month, exp_pos) - 4]
-        else:
-            exp_rus = exp_rus[exp_pos + 10:]
-        r['explanation'] = exp_rus.strip()
-
-    if soup.find(string=re.compile("Авторы и права:")):
-        r['copyright'] = str(soup.find(string=re.compile("Авторы и права:")).parent.text).strip()
-
-    return r
+    return api_key_date(api_key, '')
 
 
 @app.route('/')
 def api():
-    res = gain_json('DEMO_KEY','')
-    r = res[0]
-    date = res[1]
-    date_astro = res[2]
-
-    resp = requests.get("http://www.astronet.ru/db/apod.html?d=" + date)
-    soup = BeautifulSoup(resp.text)
-
-    date_position = soup.find(string=re.compile(date_astro))
-
-    if not date_position:
-        return 'На дату: ' + date_astro + ' астрономической картинки дня нет.'
-
-    url = date_position.parent.find_previous().find_previous().find_previous()
-    r['title'] = str(url.text).strip()
-    url_add = str(url)
-    url = url_add.split('\"')[1]
-    if url[:4] != 'http':
-        url = 'http://www.astronet.ru' + url
-    resp = requests.get(url)
-    soup = BeautifulSoup(resp.text)
-
-    month = str(soup.find('a', href='/db/apod.html?d=' + date[:7]).parent.text)
-
-    if soup.find(string=re.compile("Пояснение:")):
-        exp_rus = str(soup.find(string=re.compile("Пояснение:")).parent.parent.text)
-        exp_pos = exp_rus.find("Пояснение:")
-        if exp_rus.find(month, exp_pos):
-            exp_rus = exp_rus[exp_pos + 10:exp_rus.find(month, exp_pos) - 4]
-        else:
-            exp_rus = exp_rus[exp_pos + 10:]
-        r['explanation'] = exp_rus.strip()
-
-    if soup.find(string=re.compile("Авторы и права:")):
-        r['copyright'] = str(soup.find(string=re.compile("Авторы и права:")).parent.text).strip()
-
-    return r
+    return api_key_date('DEMO_KEY', '')
 
 
 if __name__ == '__main__':
