@@ -9,8 +9,8 @@ from astropy.coordinates import SkyCoord
 
 def form_file_request(filename, args={}):
     try:
-        f = open(filename, 'rb')
-        file_args = (filename, f.read())
+        with open(filename, 'rb') as f:
+        	file_args = (filename, f.read())
     except IOError:
         print('File %s does not exist' % filename)
         raise
@@ -33,17 +33,16 @@ def form_file_request(filename, args={}):
         file_args[0] + '\r\n' + '\r\n')
     data_post = ('\n' + '--' + boundary + '--\n')
     data = data_pre.encode() + file_args[1] + data_post.encode()
-    f.close()
     return (headers, data)
 
 def main(argv):
 	try:
 	    with open("key") as key_file:
-	        key = key_file.readline()
+	        key = key_file.readline().strip()
 	except FileNotFoundError:
 	    print("You should put a file named 'key' (with appropriate" + 
 	    	  "astrometry API key in it) in the folder with this script")
-	    sys.exit(0)
+	    sys.exit(20261)
 
 	print("Connectig to server...")
 	try:
@@ -51,11 +50,11 @@ def main(argv):
 	    	              data={'request-json': json.dumps({"apikey": key})}).json()
 	except requests.RequestException:
 	    print("Can't connect to server")
-	    sys.exit(0)
+	    sys.exit(108)
 
 	if R["status"] == "error":
 	    print(R["errormessage"])
-	    sys.exit(0)
+	    sys.exit(282)
 	    
 	session = R['session']
 	print("Connected to astrometry server")
@@ -79,11 +78,11 @@ def main(argv):
 	    #                               files=files).text)
 	except requests.RequestException:
 	    print("Connection error")
-	    sys.exit(0)
+	    sys.exit(108)
 
 	if R2["status"] == "error":
 	    print(R2["errormessage"])
-	    sys.exit(0)
+	    sys.exit(282)
 
 	subid = R2['subid']
 	print("Successfully uploaded file")
@@ -104,7 +103,7 @@ def main(argv):
 	        if 'error_message' in R2D:
 	            print("File processing error!")
 	            print(R2D['error_message'])
-	            sys.exit(0)
+	            sys.exit(282)
 	        nerrors = 0;
 	        print('Processing time is: ', 
 	        	time.strftime('%H:%M:%S', time.gmtime(time.time() - start_t)))
@@ -125,7 +124,7 @@ def main(argv):
 	    	                           + str(job) + '/calibration').json()
 	except requests.RequestException:
 	    print("Cant't obtain calibration data")
-	    sys.exit(0)
+	    sys.exit(108)
 	    
 	RA = R2D2['ra']*u.deg
 	DEC = R2D2['dec']*u.deg
