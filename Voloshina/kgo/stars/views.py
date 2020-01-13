@@ -24,10 +24,8 @@ from django.http import HttpResponseNotFound
 
 def index(request):
     if request.method == 'POST':
-        
         Name = request.POST["Name"]
         Times = request.POST["Times"]
-        
         try:
             Image = "data:image/png;base64," + base64.b64encode(createPicture(request.POST["Name"], request.POST["Times"])).decode("UTF-8")
             
@@ -76,8 +74,26 @@ def createPicture(name, times):
     kgo = Observer(longitude=longitude_kgo, latitude=latitude_kgo,
                       elevation=elevation_kgo, name="KGO", timezone="Europe/Moscow")
 
+
+    # start_time = Time('2020-01-01 '+ times)
+    # end_time = Time('2020-02-01 '+ times)
+    # delta_t = end_time - start_time
+    # observe_time = start_time + delta_t*np.linspace(0, 1, 32)
     observe_time = Time(times)
+
+
+    # sunset_tonight = kgo.sun_set_time(observe_time, which="nearest")
+    # sunrise_tonight = kgo.sun_rise_time(observe_time, which="nearest")
+
+    # star_rise = list(map(lambda observe_time : kgo.target_rise_time(observe_time, star) + 5*u.minute, observe_time))
+    # star_set = list(map(lambda observe_time: kgo.target_set_time(observe_time, star) + 5*u.minute, observe_time))
+
+    # sunset_tonight = list(map(lambda observe_time:  kgo.sun_set_time(observe_time, which="nearest"), observe_time))
+    # sunrise_tonight = list(map(lambda observe_time:  kgo.sun_rise_time(observe_time, which="nearest"), observe_time))
+
+
     visible_time = observe_time + np.linspace(-10, +10, 25)*u.hour
+    #visible_time = start + (end - start)*np.linspace(0, 1, 25)
     stars_alts = kgo.altaz(visible_time, star).alt
     sun_alts = kgo.sun_altaz(visible_time).alt
     
@@ -86,6 +102,14 @@ def createPicture(name, times):
     angle = moon_coord.separation(star_coord)
     moon_star = angle.deg
 
+    #print(stars_alts)
+    #t = Time(visible_time, format='iso', scale='utc')
+    # start = Time(list(map(lambda x,y: np.max([x, y]), sunset_tonight, star_rise)))
+    # end = Time(list(map(lambda x,y: np.min([x,y]), sunrise_tonight, star_set)))
+
+    #visible_time = (end-start)  
+    
+    #time_final = abs(visible_time.value*24)
 
     locator = mdates.MonthLocator() 
     fmt = mdates.DateFormatter('%b')
@@ -102,7 +126,7 @@ def createPicture(name, times):
     plt.grid()
 
     plt.subplot(212)
-    plt.plot_date(visible_time.plot_date, moon_star, linestyle = '-', color = 'slategrey')
+    plt.plot_date(visible_time.plot_date, moon_star, linestyle = '-', color = 'slategrey', label = 'star_name'+'\n'+times)
     plt.ylabel('Moon-Star angle, degrees')
     plt.gcf().autofmt_xdate() 
     plt.grid()
@@ -110,4 +134,3 @@ def createPicture(name, times):
 
     plt.savefig(data, format='png')
     return data.getvalue()
-
