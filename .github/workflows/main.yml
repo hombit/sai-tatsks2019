@@ -14,6 +14,7 @@ jobs:
         echo "${{ secrets.Alkousa_handle }}" > Alkousa/handle
         echo "${{ secrets.Alkousa_token }}" > Alkousa/token
         echo "${{ secrets.Balakin_discord_apikey }}" > Balakin/discord_apikey
+        echo "${{ secrets.Balakina_secret_env }}" > Balakina/secret.env
         echo "${{ secrets.Grishin_secret_env }}" > Grishin/secret.env
         echo "${{ secrets.Tavleev_secret_env }}" > Tavleev/secret.env
         echo "${{ secrets.Zheltoukhov_key_txt }}" > Zheltoukhov/key.txt
