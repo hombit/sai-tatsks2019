@@ -1,7 +1,0 @@
-OGlI.py
-setup.py
-OGLI.egg-info/PKG-INFO
-OGLI.egg-info/SOURCES.txt
-OGLI.egg-info/dependency_links.txt
-OGLI.egg-info/requires.txt
-OGLI.egg-info/top_level.txt
