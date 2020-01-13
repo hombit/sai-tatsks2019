@@ -161,8 +161,8 @@ def main():
      
                     print("downloading "+filename)
                     r = req.get(link, allow_redirects=True)
-                    a = os.path.join[]
-                    with open('/data/' + filename, 'wb') as file_result:
+                    pat = os.path.join('./data', filename)
+                    with open(pat, 'wb') as file_result:
                         file_result.write(r.content)
                     
 
