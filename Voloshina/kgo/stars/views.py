@@ -24,19 +24,24 @@ from django.http import HttpResponseNotFound
 
 def index(request):
     if request.method == 'POST':
+        
+        Name = request.POST["Name"]
+        Times = request.POST["Times"]
+        
         try:
-            content = {
-            'Name':request.POST["Name"],
-            'Times':request.POST["Times"],
-            'image': "data:image/png;base64,"+ base64.b64encode(createPicture(request.POST["Name"], request.POST["Times"])).decode("UTF-8")
-            }
-
+            Image = "data:image/png;base64," + base64.b64encode(createPicture(request.POST["Name"], request.POST["Times"])).decode("UTF-8")
+            
         except astropy.coordinates.name_resolve.NameResolveError:
             return HttpResponseNotFound("NOT RESOLVED YOUR STAR")
 
-        except ValueError:
+        except ValueError: 
             return HttpResponseNotFound("INVALID VALUE (PRESUMABLY FOR DATE)")
 
+        content = {
+            'Name':Name,
+            'Times':Times,
+            'image':Image
+        }
         return render(request, 'stars/index.html', content)
     return render(request, 'stars/index.html')
 
