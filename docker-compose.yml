@@ -7,6 +7,11 @@ services:
       - ./Alkousa/handle:/app/handle:ro
       - ./Alkousa/token:/app/token:ro
 
+  swift_light_curve:
+    build: Avakyan
+    # Works extremely long with valid objects
+    command: ["TEST_TEST_TEST"] # ["GRB 171222A"]
+
   gcn_discord:
     build: Balakin
     volumes:
