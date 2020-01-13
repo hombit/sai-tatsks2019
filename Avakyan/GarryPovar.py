@@ -34,17 +34,18 @@ def main():
     print(diction["obname"])
     resp=req.get("https://www.swift.ac.uk/user_objects/details.php?oname="+diction["obname"])
     fields = {"coords", "targ", "Tstart", "poserr"}
-    parameters =resp.text.split(';')
+    parameters = resp.text.split(';')
     print(resp.text)
     for part in parameters:
         if "=" not in part:
             continue
         field, value = part.split("=")
-        if field not in fields:
-            continue
-        value=value[1:-1]
-        diction[field] = value
-            
+        for i in fields:
+            if i not in field:
+                continue
+            value=value[1:-1]
+            diction[i] = value
+        
        
     if diction["targ"]=='No observations found':
         print("no obserbation")
