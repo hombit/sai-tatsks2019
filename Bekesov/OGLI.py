@@ -16,7 +16,7 @@ filereq = requests.get(fullpath)
 
 lightcurve = filereq.text
 
-with open(name + ".csv", "wt") as file:
+with open(name + "-" + band + ".csv", "wt") as file:
 
        file.write("HJD-2450000   mag  err")
 
