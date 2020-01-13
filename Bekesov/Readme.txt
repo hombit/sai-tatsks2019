@@ -1,0 +1,1 @@
+Program for downloading lightcurves from OGLI catalog.
