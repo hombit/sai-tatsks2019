@@ -18,7 +18,7 @@ import matplotlib.dates as mdates
 from matplotlib import rc, rcParams
 import matplotlib.font_manager
 import numpy as np
-import math
+
 
 def index(request):
     if request.method == 'POST':
