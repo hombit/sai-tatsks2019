@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Видимость в КГО</title>
+</head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-3 offset-1">
+                    <form action="" method="post">
+                    {%csrf_token%}
+                        <label for="Name"><b>Название объекта</b></label>
+                        {% if Name%}
+                        <input type="text" name="Name" value="{{Name}}" class="form-control" placeholder="Например:Sirius">
+                        {% else %}
+                        <input type="text" name="Name">
+                        {% endif %}
+                        <label for="Times"><b>Время наблюдений</b></label>
+                        {% if Times%}
+                        <input type="text" name="Times" value="{{Times}}"  class="form-control" placeholder="Например:06:00:00">
+                        {% else %}
+                        <input type="text" name="Times">
+                        {% endif %}
+                        <input type="submit" value="ОК" class="mt-2 btn btn-danger">
+                    </form>
+                </div>
+                <div class="col-6 offset-1">
+                    {% if Error%}
+                        <b>{{ Error }}</b>
+                    {% endif %}
+                </div>
+                <div class="col-6 offset-1">
+                    <body>
+                    {% if image%}
+                        <img src={{ image }}>
+                    {% endif %}
+
+                    </body>
+                </div>
+            </div>
+        </div>
+</html>
+
