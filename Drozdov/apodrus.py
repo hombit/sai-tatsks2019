@@ -48,7 +48,7 @@ def api_key_date_picture(api_key, date):
     url = date_position.parent.find_previous().find_previous().find_previous()
     title_rus = url.text
     url = BeautifulSoup(str(url)).find('a', href=True)["href"]
-    url = urllib.parse.urljoin(url, f'http://www.astronet.ru{url}')
+    url = urllib.parse.urljoin('http://www.astronet.ru', url)
     resp = requests.get(url)
     soup = BeautifulSoup(resp.text)
 
@@ -112,7 +112,7 @@ def api_key_date(api_key, date):
     url = date_position.parent.find_previous().find_previous().find_previous()
     r['title'] = str(url.text).strip()
     url=BeautifulSoup(str(url)).find('a',href=True)["href"]
-    url = urllib.parse.urljoin(url, f'http://www.astronet.ru{url}')
+    url = urllib.parse.urljoin('http://www.astronet.ru', url)
     resp = requests.get(url)
     soup = BeautifulSoup(resp.text)
 
