@@ -7,11 +7,11 @@ name = sys.argv[1]
 
 def get_lightcurve(band, name):
     
-    length = len(name)
-    
-    url = "http://ogledb.astrouw.edu.pl/~ogle/CVS/data/{}/{}/{}{}".format(band, name[-3:], name, ".dat")
+    url = "http://ogledb.astrouw.edu.pl/~ogle/CVS/data/{}/{}/{}.dat".format(band, name[-2:], name) 
 
     filereq = requests.get(url)
+
+    filereq.raise_for_status()
 
     lightcurve = filereq.text
 
