@@ -21,7 +21,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '072iv86969h3cf39x6$#q4_l72vvb8j#i%qi=v2m4$@ycsc-(c'
-
+try:
+    with open(os.path.join(BASE_DIR, 'key'),'r') as f:
+        SECRET_KEY = f.read().strip()
+except OSError:
+    import random
+    result = "".join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for i in range(50)])
+    with open(os.path.join(BASE_DIR, 'key'),'w') as f:
+        f.write(result)
+    SECRET_KEY = result
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -29,7 +37,6 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
