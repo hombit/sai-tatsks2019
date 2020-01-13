@@ -10,10 +10,10 @@ import requests
 
 def gain_json(api_key, date):
     res = []
-    print(api_key)
+#    print(api_key)
     if not api_key:
         api_key = 'DEMO_KEY'
-    print(f'https://api.nasa.gov/planetary/apod?api_key={api_key}&date={date}')
+#    print(f'https://api.nasa.gov/planetary/apod?api_key={api_key}&date={date}')
     r = requests.get(f'https://api.nasa.gov/planetary/apod?api_key={api_key}&date={date}').json()
 
     if not date:
@@ -28,6 +28,15 @@ def gain_json(api_key, date):
     return res
 
 
+def render(api_key, date):
+    r, date, date_astro = gain_json(api_key, date)
+
+    resp = requests.get(f'http://www.astronet.ru/db/apod.html?d={date}')
+    soup = BeautifulSoup(resp.text)
+
+    return [r, date, date_astro, soup.find(string=re.compile(date_astro))]
+
+
 app = Flask(__name__)
 
 
@@ -35,12 +44,9 @@ app = Flask(__name__)
 def api_key_date_picture(api_key, date):
     if (api_key == 'favicon.ico') | (api_key == 'robos.txt'):
         return render_template('error404.html'), 404
-    r, date, date_astro = gain_json(api_key, date)
 
-    resp = requests.get(f'http://www.astronet.ru/db/apod.html?d={date}')
-    soup = BeautifulSoup(resp.text)
+    r, date, date_astro, date_position = render(api_key, date)
 
-    date_position = soup.find(string=re.compile(date_astro))
     if not date_position:
         return render_template('error404.html'), 404
 
@@ -96,15 +102,8 @@ def api_picture():
 def api_key_date(api_key, date):
     if (api_key == 'favicon.ico') | (api_key == 'robos.txt'):
         return render_template('error404.html'), 404
-    r, date, date_astro = gain_json(api_key, date)
 
-    resp = requests.get(f'http://www.astronet.ru/db/apod.html?d={date}')
-    soup = BeautifulSoup(resp.text)
-
-    print(date_astro)
-    print(type(date_astro))
-
-    date_position = soup.find(string=re.compile(date_astro))
+    r, date, date_astro, date_position = render(api_key, date)
 
     if not date_position:
         return render_template('error404.html'), 404
