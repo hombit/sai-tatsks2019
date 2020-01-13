@@ -54,8 +54,8 @@ def api_key_date_picture(api_key, date):
 
     month = str(soup.find('a', href=f'/db/apod.html?d={date[:7]}').parent.text)
 
-    if soup.find(string=re.compile("Пояснение:")):
-        exp_rus = str(soup.find(string=re.compile("Пояснение:")).parent.parent.text)
+    if soup.find(string=u'Пояснение:'):
+        exp_rus = str(soup.find(string=u'Пояснение:').parent.parent.text)
         exp_pos = exp_rus.find("Пояснение:")
         if exp_rus.find(month, exp_pos):
             exp_rus = exp_rus[exp_pos + len("Пояснение:"):exp_rus.find(month, exp_pos) - 4]
@@ -65,13 +65,13 @@ def api_key_date_picture(api_key, date):
         title_rus = ''
         exp_rus = 'Русский перевод отсутствует.'
 
-    if soup.find(string=re.compile("Перевод:")):
-        translate = soup.find(string=re.compile("Перевод:")).parent.find_previous().text
+    if soup.find(string=u'Перевод:'):
+        translate = soup.find(string=u'Перевод:').parent.find_previous().text
     else:
         translate = ''
 
-    if soup.find(string=re.compile("Авторы и права:")):
-        copyright_rus = soup.find(string=re.compile("Авторы и права:")).parent.text
+    if soup.find(string=u'Авторы и права:'):
+        copyright_rus = soup.find(string=u'Авторы и права:').parent.text
     else:
         copyright_rus = ''
 
@@ -101,6 +101,9 @@ def api_key_date(api_key, date):
     resp = requests.get(f'http://www.astronet.ru/db/apod.html?d={date}')
     soup = BeautifulSoup(resp.text)
 
+    print(date_astro)
+    print(type(date_astro))
+
     date_position = soup.find(string=re.compile(date_astro))
 
     if not date_position:
@@ -115,8 +118,8 @@ def api_key_date(api_key, date):
 
     month = str(soup.find('a', href=f'/db/apod.html?d={date[:7]}').parent.text)
 
-    if soup.find(string=re.compile("Пояснение:")):
-        exp_rus = str(soup.find(string=re.compile("Пояснение:")).parent.parent.text)
+    if soup.find(string=u'Пояснение:'):
+        exp_rus = str(soup.find(string=u'Пояснение:').parent.parent.text)
         exp_pos = exp_rus.find("Пояснение:")
         if exp_rus.find(month, exp_pos):
             exp_rus = exp_rus[exp_pos + len("Пояснение:"):exp_rus.find(month, exp_pos) - 4]
@@ -127,8 +130,8 @@ def api_key_date(api_key, date):
         exp_rus = " ".join(exp_rus.split())
         r['explanation'] = f'{eng_text} Russian text: {exp_rus}'
 
-    if soup.find(string=re.compile("Авторы и права:")):
-        r['copyright'] = str(soup.find(string=re.compile("Авторы и права:")).parent.text).strip()
+    if soup.find(string=u'Авторы и права:'):
+        r['copyright'] = str(soup.find(string=u'Авторы и права:').parent.text).strip()
 
     return r
 
