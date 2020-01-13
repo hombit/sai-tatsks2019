@@ -1,0 +1,6 @@
+apikey
+*.sublime*
+*.pdf
+*.png
+.ads/dev_key
+.DS_STOREp
