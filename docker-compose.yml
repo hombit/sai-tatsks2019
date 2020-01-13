@@ -40,6 +40,13 @@ services:
     build: Grishin
     env_file: ./Grishin/secret.env
 
+  astrometry:
+    build: Lander
+    command: ["/data/test.jpg"]
+    volumes:
+      - ./Lander/key:/app/key:ro
+      - ./Lander/data:/data
+
   ztf_color:
     build: Podzolkova
 
