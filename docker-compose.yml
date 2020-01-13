@@ -19,6 +19,12 @@ services:
     volumes:
       - ./Balakin/discord_apikey:/app/discord_apikey:ro
 
+  ogle_light_curve:
+    build: Bekesov
+    volumes:
+      - ./Bekesov/data:/data
+    command: ["OGLE-BLG-CEP-01"]
+
   sn_peak:
     build: Fedotieva
     command: ["SN2017eye"]
