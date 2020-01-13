@@ -19,7 +19,7 @@ def is_downloadable(url):
 
 def main():
 
-    nam = sys.argv[1]+ " " + sys.argv[2]
+    nam = sys.argv[1]
 
     diction={
     "coords":"",
@@ -33,15 +33,17 @@ def main():
     print(nam)
     print(diction["obname"])
     resp=req.get("https://www.swift.ac.uk/user_objects/details.php?oname="+diction["obname"])
+    fields = {"coords", "targ", "Tstart", "poserr"}
     parameters =resp.text.split(';')
     print(resp.text)
-    for i in parameters:
-        for j in diction:
-            if j in i.split("=")[0]:
-                diction[j]=i.split("=")[1][1:-1]
+    for part in parameters:
+        field, value = part.split("=")
+        if field not in fields:
+            continue
+        value=value[1:-1]
+        diction[field] = value
             
-        
-
+       
     if diction["targ"]=='No observations found':
         print("no obserbation")
         exit(1)
