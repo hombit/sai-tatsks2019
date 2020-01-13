@@ -7,7 +7,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rc, rcParams
 import calendar
-import os
 import math
 
 rcParams['font.size'] = 14
@@ -39,21 +38,9 @@ def make_plot(dt_list, save):
     ax.set_xticklabels(str_index)
     plt.setp(ax.get_xticklabels(), rotation=55)
     if save is True:
-        plt.savefig('Trends.png')
+        plt.savefig('./Trends.png')
     else:
         plt.show()
-
-
-def read_apikey():
-    try:
-        ads.config.token = os.environ['ADS_DEV_KEY']
-    except KeyError:
-        try:
-            with open('./apikey', 'r') as f:
-                ads.config.token = f.read().strip()
-        except OSError:
-            print('No token, exiting')
-            exit(1)
 
 
 def parser():
@@ -74,7 +61,6 @@ def append_next(q, l):
 
 
 def main():
-    read_apikey()
     args = parser().parse_args()
     dt_list = []
     now = datetime.datetime.now()
