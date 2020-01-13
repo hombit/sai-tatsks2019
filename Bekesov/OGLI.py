@@ -1,25 +1,37 @@
 import requests
 import sys
 import csv
+import os
 
-name = sys.argv[2]
+name = sys.argv[1]
 
-length = len(name)
+def get_lightcurve(band, name):
+    
+    length = len(name)
+    
+    dirfile = "http://ogledb.astrouw.edu.pl/~ogle/CVS/data/{}/{}/".format(band, name[length - 2] + name[length-1])
 
-band = sys.argv[1]
+    fullpath = dirfile + name + ".dat"
 
-dirfile = "http://ogledb.astrouw.edu.pl/~ogle/CVS/data/{}/{}/".format(band, name[length - 2] + name[length-1])
+    filereq = requests.get(fullpath)
 
-fullpath = dirfile + name + ".dat"
+    lightcurve = filereq.text
 
-filereq = requests.get(fullpath)
+    dir = "data"
+    
+    os.makedirs(dir, exist_ok=True)
+    
+    filename = "{}-{}.csv".format(name, band)
 
-lightcurve = filereq.text
+    with open(dir.filename, "wt") as file:
 
-with open(name + "-" + band + ".csv", "wt") as file:
+        file.write("HJD-2450000   mag  err")
 
-       file.write("HJD-2450000   mag  err")
+        file.write("\n")
 
-       file.write("\n")
+        file.write(lightcurve)
 
-       file.write(lightcurve)
+    
+get_lightcurve("I", name)
+
+get_lightcurve("V", name)
