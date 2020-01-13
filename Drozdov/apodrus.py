@@ -1,6 +1,7 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import urllib.parse
 from flask import Flask, render_template
 from bs4 import BeautifulSoup
 import re
@@ -32,6 +33,8 @@ app = Flask(__name__)
 
 @app.route('/<api_key>/<date>/picture')
 def api_key_date_picture(api_key, date):
+    if (api_key == 'favicon.ico') | (api_key == 'robos.txt'):
+        return render_template('error404.html'), 404
     r, date, date_astro = gain_json(api_key, date)
 
     resp = requests.get(f'http://www.astronet.ru/db/apod.html?d={date}')
@@ -44,11 +47,8 @@ def api_key_date_picture(api_key, date):
     main = date_position.parent.find_next().text
     url = date_position.parent.find_previous().find_previous().find_previous()
     title_rus = url.text
-    url_add = str(url)
-    url = url_add.split('\"')[1]
-    if url[:4] != 'http':
-        url = 'http://www.astronet.ru' + url
-    print(url)
+    url = BeautifulSoup(str(url)).find('a', href=True)["href"]
+    url = urllib.parse.urljoin(url, f'http://www.astronet.ru{url}')
     resp = requests.get(url)
     soup = BeautifulSoup(resp.text)
 
@@ -94,6 +94,8 @@ def api_picture():
 
 @app.route('/<api_key>/<date>')
 def api_key_date(api_key, date):
+    if (api_key == 'favicon.ico') | (api_key == 'robos.txt'):
+        return render_template('error404.html'), 404
     r, date, date_astro = gain_json(api_key, date)
 
     resp = requests.get(f'http://www.astronet.ru/db/apod.html?d={date}')
@@ -106,10 +108,8 @@ def api_key_date(api_key, date):
 
     url = date_position.parent.find_previous().find_previous().find_previous()
     r['title'] = str(url.text).strip()
-    url_add = str(url)
-    url = url_add.split('\"')[1]
-    if url[:4] != 'http':
-        url = 'http://www.astronet.ru' + url
+    url=BeautifulSoup(str(url)).find('a',href=True)["href"]
+    url = urllib.parse.urljoin(url, f'http://www.astronet.ru{url}')
     resp = requests.get(url)
     soup = BeautifulSoup(resp.text)
 
@@ -122,7 +122,10 @@ def api_key_date(api_key, date):
             exp_rus = exp_rus[exp_pos + len("Пояснение:"):exp_rus.find(month, exp_pos) - 4]
         else:
             exp_rus = exp_rus[exp_pos + len("Пояснение:"):]
-        r['explanation'] = exp_rus.strip()
+        eng_text = r['explanation']
+        exp_rus = exp_rus.strip().replace('\n', '')
+        exp_rus = " ".join(exp_rus.split())
+        r['explanation'] = f'{eng_text} Russian text: {exp_rus}'
 
     if soup.find(string=re.compile("Авторы и права:")):
         r['copyright'] = str(soup.find(string=re.compile("Авторы и права:")).parent.text).strip()
