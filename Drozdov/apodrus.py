@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from flask import Flask, render_template
@@ -94,9 +94,6 @@ def api_picture():
 
 @app.route('/<api_key>/<date>')
 def api_key_date(api_key, date):
-    print(api_key)
-    if api_key == 'favicon.ico':
-        return favicon()
     r, date, date_astro = gain_json(api_key, date)
 
     resp = requests.get(f'http://www.astronet.ru/db/apod.html?d={date}')
