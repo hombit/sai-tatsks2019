@@ -151,7 +151,7 @@ def main():
             try:
                 filename=downl.rsplit('/', 1)[1]
                 link=downl
-            except IndexError::
+            except IndexError:
                 filename=downl
                 link="https://www.swift.ac.uk/user_objects/tprods/"+diction["outdir"]+"/lc/"+filename
 
