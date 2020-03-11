@@ -10,7 +10,10 @@ from astropy.utils import iers
 iers.conf.auto_download = False
 
 KGO_scope = EarthLocation(lat=43.73616497258118*u.deg, lon=42.66745996540703*u.deg, height=2112.*u.m)
-
+max_measurement_delay = 300
+h_lim_up = -12
+h_lim_down = -18
+extinction = 1
 
 client = InfluxDBClient(host='eagle.sai.msu.ru', port=80)
 
@@ -36,22 +39,22 @@ AStime = Time(time_array, scale='utc' )
 nowFrame = AltAz(obstime=time_array,location=KGO_scope)	
 sun_alt =np.array(get_sun(AStime).transform_to(nowFrame).alt.deg)
 
-mask = (data_arr <1) & (sun_alt<-12)
-time_array=time_array[mask]
-sun_alt=sun_alt[mask]
+mask_up = (data_arr <extinction) & (sun_alt<h_lim_up) 
+mask_down = (data_arr <extinction) & (sun_alt<h_lim_up) & (sun_alt>h_lim_down)
+time_arrayUP=time_array[mask_up]
+time_arrayDOWN=time_array[mask_down]
 
 def calculate_time(time_array):
 	time_points=0
 	for k in range(len(time_array)-1):
 		tdelt = (time_array[k+1]-time_array[k]).total_seconds() 
-		if tdelt<300:
+		if tdelt<max_measurement_delay:
 			time_points+=tdelt
 	return round(time_points/3600)
 
-htime12 = calculate_time(time_array)
-print(htime12, 'hours of clear sky with sun altitude less then -12')
+htimeUP = calculate_time(time_arrayUP)
+print(htimeUP, 'hours of clear sky with sun altitude less then',h_lim_up)
 
-time_array=time_array[sun_alt>-18]
+htimeUtoD = calculate_time(time_arrayDOWN)
 
-print(htime12 - calculate_time(time_array), 'hours of clear sky with sun altitude less then -18')
-
+print(htimeUP - htimeUtoD , 'hours of clear sky with sun altitude less then',h_lim_down)
