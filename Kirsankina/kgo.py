@@ -13,9 +13,8 @@ KGO_scope = EarthLocation(lat=43.73616497258118*u.deg, lon=42.66745996540703*u.d
 
 
 client = InfluxDBClient(host='eagle.sai.msu.ru', port=80)
-base=client.get_list_database()
 
-response = client.query('SELECT * FROM "prephot.extinction" WHERE time > now() - 365d AND type = \'flux\' ; ',database='taxandria')
+response = client.query('''SELECT * FROM "prephot.extinction" WHERE time > now() - 365d AND type = 'flux' ; ''',database='taxandria')
 
 print('response done')
 
@@ -41,21 +40,18 @@ mask = (data_arr <1) & (sun_alt<-12)
 time_array=time_array[mask]
 sun_alt=sun_alt[mask]
 
-time_points=0
-for k in range(len(time_array)-1):
-	tdelt = (time_array[k+1]-time_array[k]).total_seconds() 
-	if tdelt<300:
-		time_points+=tdelt
+def calculate_time(time_array):
+	time_points=0
+	for k in range(len(time_array)-1):
+		tdelt = (time_array[k+1]-time_array[k]).total_seconds() 
+		if tdelt<300:
+			time_points+=tdelt
+	return round(time_points/3600)
 
-print(time_points//3600, 'hours of clear sky with sun altitude less then -12')
+htime12 = calculate_time(time_array)
+print(htime12, 'hours of clear sky with sun altitude less then -12')
 
 time_array=time_array[sun_alt>-18]
 
-for k in range(len(time_array)-1):
-	tdelt = (time_array[k+1]-time_array[k]).total_seconds() 
-	if tdelt<300:
-		time_points-=tdelt
-
-print(time_points//3600, 'hours of clear sky with sun altitude less then -18')
-
+print(htime12 - calculate_time(time_array), 'hours of clear sky with sun altitude less then -18')
 
