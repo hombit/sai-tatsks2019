@@ -5,10 +5,12 @@ https://istina.msu.ru/organizations/department/275695/
 
 import requests
 import re
+import urllib
 from bs4 import BeautifulSoup as bs
 import lxml
 from pprint import pprint
 from datetime import datetime
+import argparse
 
 
 
@@ -43,8 +45,7 @@ def get_date_prev_month():
     now = datetime.now()
     if now.month == 1:
         return now.year - 1, 12
-    else:
-        return now.year, now.month - 1
+    return now.year, now.month - 1
 
 
 def doi2json(doi):
@@ -65,9 +66,9 @@ def doi2json(doi):
 
     headers = {'accept': 'application/vnd.citationstyles.csl+json'}
     r = requests.get(doi, headers=headers)
-    try:
+    if r.status_code == requests.codes.ok:
         return r.json()
-    except Exception:
+    else:
         return None
 
 def get_pub_date(doi):
@@ -93,10 +94,10 @@ def get_pub_date(doi):
         date = doi_json['created']['date-parts'][0]
         return date[0], date[1]
     except KeyError:
-        print('DOI is not found at doi.org. There is no date "created" at json metadata.')
+        print('DOI is not found at doi.org. There is no date "created" at json metadata:')
         return None
     except TypeError:
-        print('DOI is not found at doi.org. There is no json metadata.')
+        print('DOI is not found at doi.org. There is no json metadata:')
         return None
 
     
@@ -119,8 +120,8 @@ def check_if_article_is_new(doi):
     """
     
     pub_date = get_pub_date(doi)
-    in_current = pub_date == get_date_current_month() and pub_date != None
-    in_previous = pub_date == get_date_prev_month() and pub_date != None
+    in_current = pub_date == get_date_current_month() and pub_date is not None
+    in_previous = pub_date == get_date_prev_month() and pub_date is not None
     return in_current, in_previous
 
 
@@ -151,16 +152,29 @@ def find_all_new_articles_from_author(href, current_month=True, prev_month=True)
     txt = request.text
     soup = bs(txt, features='lxml')
     articles_presoup = soup.find('h4', class_='activity_label')
-    if articles_presoup == None: # если страничка на истине не имеет части со статьями, то искать нечего
-        print('There is no articles at this page.')
+    if articles_presoup is None: # если страничка на истине не имеет части со статьями, то искать нечего
+        print('There is no actvity at this page:')
         return []
     articles_soup = articles_presoup.next_sibling.next_sibling # здесь .next_sibling = \n, а мне нужно следующее вложение после <h4>
+    year_of_activity = articles_soup.find('ul', class_='activity')
+    yr = year_of_activity.get('data-year')
+    if yr is None:
+        print('There is no articles at this page:')
+        return []
+    now_yr = get_date_current_month()
+    if now_yr[1] == 1: # если текущий месяц - январь, проверяем статьи из текущего и предыдущего года
+        if int(yr) < now_yr[0] - 1:
+            print('There is no activity in the current or previous year:')
+            return []
+    elif int(yr) < now_yr[0]: # иначе проверяем статьи только из текущего года (или, возможно "будущего" - так бывает)
+        print('There is no activity in the current year:')
+        return []
     dois = articles_soup.find_all('a', string='DOI')
     articles = []
     for link in dois:
         doi = link.get('href')
-        if doi == None: # у новых статей может не быть отмечен DOI, в таком случае мы проверяем следующую статью
-            print('DOI is not found at ISTINA.')
+        if doi is None: # у новых статей может не быть отмечен DOI, в таком случае мы проверяем следующую статью
+            print('DOI is not found at ISTINA:')
             continue
         check = check_if_article_is_new(doi) # (!) здесь я предполагаю, что статьи на истине расположены строго по времени публикации
         if check[0] and current_month:
@@ -200,12 +214,12 @@ def get_list_of_profiles(href):
     list_of_profiles = []
     for link in soup.find_all(href=find_profiles):
         cut_link = link.get('href')
-        str_link = 'https://istina.msu.ru' + cut_link
+        str_link = urllib.parse.urljoin('https://istina.msu.ru', cut_link)
         list_of_profiles.append(str_link)
     return list_of_profiles
 
 
-def find_all_profiles(href, num=1):
+def find_all_profiles(href, num_start=1, num_stop=1):
     """
     Function to get all web-links to the profiles in ISTINA system.
 
@@ -214,8 +228,11 @@ def find_all_profiles(href, num=1):
     href : str
         Reference to the department page from which the profiles should be found.
 
-    num : int, optional
+    num_start : int, optional
         Number of the page, from which search of profiles starts. Default is 1.
+        
+    num_end : int, optional
+        Number of the page, at which search of profiles stops. Default is 1.
     
     Returns
     -------
@@ -226,29 +243,43 @@ def find_all_profiles(href, num=1):
     
     print('Collecting all profiles from the organization...')
     profiles = []
-    i = num
+    i = num_start
     while True:
         profiles_ = get_list_of_profiles(f'{href}/workers/?&p={i}')
-        if len(profiles_) == 0:
+        if len(profiles_) == 0 or i > num_stop:
             break
         profiles += (profiles_)
         i += 1
     return profiles
 
 
+def parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a', '--num_start', default=1, type=int,
+                        help='Number of starting search page at ISTINA')
+    parser.add_argument('-b', '--num_stop', default=1, type=int,
+                        help='Number of ending search page at ISTINA')
+    parser.add_argument('-c', '--current', default=False, type=bool,
+                        help='True if search for articles in current month. Default if False')
+    parser.add_argument('-p', '--previous', default=True, type=bool,
+                        help='True if search for articles in previous month. Default if True')
+    return parser
+
+
 def main():
-    profiles = find_all_profiles('https://istina.msu.ru/organizations/department/275695', num=12)
+    args = parser().parse_args()
+    profiles = find_all_profiles('https://istina.msu.ru/organizations/department/275695', num_start=args.num_start, num_stop=args.num_stop)
     print('Collecting all new articles from the organization...')
     all_articles = []
     for profile in profiles:
-        articles = find_all_new_articles_from_author(profile, False, True)
+        articles = find_all_new_articles_from_author(profile, args.current, args.previous)
         print(f'Link: {profile}, articles: {articles}.')
         all_articles += articles
     all_articles = set(all_articles)
     pprint(all_articles)
     print(f'Number of found articles: {len(all_articles)}. Note that articles with incorrect DOI are neglected.')
-    
-    
-    
+
+
+
 if __name__ == '__main__':
     main()
