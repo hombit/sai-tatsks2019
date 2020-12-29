@@ -1,7 +1,3 @@
 requests
 bs4
 lxml
-datetime
-pprint
-urllib
-argparse
