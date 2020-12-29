@@ -255,20 +255,22 @@ def find_all_profiles(href, num_start=1, num_stop=1):
 
 def parser():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-r', '--ref', default='https://istina.msu.ru/organizations/department/275695', type=str,
+                        help='Reference to the department at ISTINA. Default is SAI')
     parser.add_argument('-a', '--num_start', default=1, type=int,
                         help='Number of starting search page at ISTINA')
     parser.add_argument('-b', '--num_stop', default=1, type=int,
                         help='Number of ending search page at ISTINA')
     parser.add_argument('-c', '--current', default=False, type=bool,
-                        help='True if search for articles in current month. Default if False')
+                        help='True if search for articles in current month. Default is False')
     parser.add_argument('-p', '--previous', default=True, type=bool,
-                        help='True if search for articles in previous month. Default if True')
+                        help='True if search for articles in previous month. Default is True')
     return parser
 
 
 def main():
     args = parser().parse_args()
-    profiles = find_all_profiles('https://istina.msu.ru/organizations/department/275695', num_start=args.num_start, num_stop=args.num_stop)
+    profiles = find_all_profiles(args.ref, num_start=args.num_start, num_stop=args.num_stop)
     print('Collecting all new articles from the organization...')
     all_articles = []
     for profile in profiles:
