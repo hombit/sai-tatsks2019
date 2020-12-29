@@ -261,9 +261,9 @@ def parser():
                         help='Number of starting search page at ISTINA')
     parser.add_argument('-b', '--num_stop', default=1, type=int,
                         help='Number of ending search page at ISTINA')
-    parser.add_argument('-c', '--current', default=False, type=bool,
+    parser.add_argument('-c', '--current', default=False, action='store_true',
                         help='True if search for articles in current month. Default is False')
-    parser.add_argument('-p', '--previous', default=True, type=bool,
+    parser.add_argument('-p', '--previous', default=True, action='store_false',
                         help='True if search for articles in previous month. Default is True')
     return parser
 
