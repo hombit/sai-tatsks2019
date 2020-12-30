@@ -40,12 +40,19 @@ services:
     build: Grishin
     env_file: ./Grishin/secret.env
 
+  kgo_good_night:
+    build: Kirsankina
+
   astrometry:
     build: Lander
     command: ["/data/test.jpg"]
     volumes:
       - ./Lander/key:/app/key:ro
       - ./Lander/data:/data
+
+  istina:
+    build: Nekrasov
+    command: ["-r", "https://istina.msu.ru/organizations/department/275740/"]
 
   ztf_color:
     build: Podzolkova
