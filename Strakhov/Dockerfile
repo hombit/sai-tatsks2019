@@ -3,7 +3,7 @@ FROM python:3.8-buster
 RUN apt-get update\
     && apt-get install -y libproj-dev proj-data proj-bin libgeos-dev
 
-RUN pip install gunicorn
+RUN pip install gunicorn numpy
 
 RUN mkdir /app
 WORKDIR /app
