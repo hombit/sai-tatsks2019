@@ -1,4 +1,4 @@
-
+#!/usr/bin/python3
 
 # Сайт https://openweathermap.org/
 
@@ -32,12 +32,11 @@ def main():
             api_key0 = str(a.readline()[:-1])
 
         api_key = api_key0
-        #api_key = "10f39d05e44c8f1526aeee5522620d2d"
         lat = "43.74611" # KGO coordinates
         lon = "42.6675"
         url = "https://api.openweathermap.org/data/2.5/onecall?lat=%s&lon=%s&appid=%s&units=metric" % (lat, lon, api_key)
         
-        schedule.every(1).minutes.do(hourly_weather_KGO, url, lat, lon, api_key, writer) # поминутное накопление
+        schedule.every(1).minutes.do(hourly_weather_KGO, url, lat, lon, api_key, writer) # поминутное накопление(для упрощения проверки)
         #schedule.every(1).hour.do(hourly_weather_KGO, url, lat, lon, api_key, writer) # почасовое накопление
         while True:   
             schedule.run_pending()
