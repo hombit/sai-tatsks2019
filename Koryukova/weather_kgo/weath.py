@@ -36,7 +36,7 @@ def main():
         lon = "42.6675"
         url = "https://api.openweathermap.org/data/2.5/onecall?lat=%s&lon=%s&appid=%s&units=metric" % (lat, lon, api_key)
         
-        schedule.every(1).minutes.do(hourly_weather_KGO, url, lat, lon, api_key, writer) # поминутное накопление
+        schedule.every(1).minutes.do(hourly_weather_KGO, url, lat, lon, api_key, writer) # поминутное накопление(для облегчения проверки)
         #schedule.every(1).hour.do(hourly_weather_KGO, url, lat, lon, api_key, writer) # почасовое накопление
         while True:   
             schedule.run_pending()
