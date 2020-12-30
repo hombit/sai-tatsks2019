@@ -40,9 +40,6 @@ services:
     build: Grishin
     env_file: ./Grishin/secret.env
 
-  kgo_good_night:
-    build: Kirsankina
-
   astrometry:
     build: Lander
     command: ["/data/test.jpg"]
