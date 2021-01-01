@@ -23,7 +23,7 @@ with np.errstate(invalid='ignore'):
     indx_less=np.argwhere(vals<voltage_threshold)
 
 
-#График зависимсоти напряжения от времени
+#График зависимости напряжения от времени
 plt.plot(dates,vals)
 plt.xticks(rotation=25)
 plt.grid()
