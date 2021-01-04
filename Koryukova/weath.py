@@ -3,8 +3,6 @@ import json
 import csv
 import datetime
 import schedule 
-import csv
-import numpy as np
 import pandas as pd
 
 # Сайт https://openweathermap.org/
