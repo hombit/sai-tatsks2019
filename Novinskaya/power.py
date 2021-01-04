@@ -19,7 +19,7 @@ def power_kgo():
     end_date_str = end_date.strftime("%Y-%m-%dT%H:%M:%SZ")
     
     #Минимальные значения напряжения в определенный период
-    query = client.query('''select min(value) from snmp_value where \"type\"='voltage' and \"type_instance\"='input' and time >= '{}' and time<= '{}' group by time(1h)'''.format(begin_date_str,end_date_str), database='collectd')
+    query = client.query('''select min(value) from snmp_value where "type"='voltage' and "type_instance"='input' and time >= '{}' and time<= '{}' group by time(1h)'''.format(begin_date_str,end_date_str), database='collectd')
     
 
     #Временные метки, формат
