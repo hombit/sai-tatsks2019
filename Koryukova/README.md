@@ -31,6 +31,14 @@
 >42.6675 #(долгота)
 
 
-Приостановка программы прерывает запись параметров погодных условий, доступной в виде csv таблицы.
+Приостановка программы прерывает запись параметров погодных условий, доступной в виде csv таблицы. 
 
+Единицы измерения: 
 
+temperature [Celsius]
+temperature_feel [Celsius]
+pressure [hPa]
+humidity [%]
+clouds [%]
+wind_speed [meter/sec]
+wind_degree [degrees (meteorological)]
