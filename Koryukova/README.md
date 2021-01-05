@@ -35,10 +35,17 @@
 
 Единицы измерения: 
 
+
 temperature [Celsius]
+
 temperature_feel [Celsius]
+
 pressure [hPa]
+
 humidity [%]
+
 clouds [%]
+
 wind_speed [meter/sec]
+
 wind_degree [degrees (meteorological)]
