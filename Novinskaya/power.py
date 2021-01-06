@@ -26,7 +26,7 @@ def power_kgo():
     vals = data[:,1].astype(np.double)
     
     
-    print('Number of power outages = {}'.format(np.sum(np.diff(np.concatenate([[0],vals<VOLTAGE_THRESHOLD,[0]]))>0)))
+    print('Number of power outages = {}'.format(np.sum(np.diff(vals<VOLTAGE_THRESHOLD,prepend=0,append=0)>0)))
     
     client.close()
     
