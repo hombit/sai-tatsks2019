@@ -35,7 +35,9 @@ def power_kgo():
     data = np.array(query.raw['series'][0]['values'])
     #dates = pd.to_datetime(data[:,0])
     vals = data[:,1].astype(np.double)
-    print(vals<VOLTAGE_THRESHOLD)
+    #print(vals<VOLTAGE_THRESHOLD)
+    
+
 
 
     #with np.errstate(invalid='ignore'):
@@ -46,9 +48,12 @@ def power_kgo():
     #result= np.split(l, np.where(np.diff(l,axis=0)>1)[0]+1)
 
     #print('Number of power outages = {}'.format(len(indx_less)))
+  
     
-    print('Number of power outages = {}'.format(sum(k for k,v in groupby(vals<VOLTAGE_THRESHOLD))))
-
+    #print('Number of power outages = {}'.format(sum(k for k,v in groupby(vals<VOLTAGE_THRESHOLD))))
+    
+    print('Number of power outages = {}'.format(np.sum(np.diff(np.concatenate([[0],vals<VOLTAGE_THRESHOLD,[0]]))>0)))
+    
     client.close()
     
     #return
