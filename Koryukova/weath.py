@@ -10,7 +10,7 @@ latitude_kgo = "43.74611"
 longitude_kgo = "42.6675"
 
 
-def hourly_weather_KGO(latitude, longitude, API_key, table):
+def hourly_weather_KGO(latitude, longitude, API_key, table, file):
     """Take weather parameters each minute or hour"""
 
     param_for_url = {'lat':latitude, 'lon':longitude, 'appid':API_key, 'units':'metric'}
@@ -27,6 +27,7 @@ def hourly_weather_KGO(latitude, longitude, API_key, table):
         row.append(json_data['current'][i]) 
   
     table.writerow(row)
+    file.flush()
         
     print('Data saved', datetime.datetime.now()) #отображаем время в которое произошла запись данных
 
@@ -64,7 +65,7 @@ def main():
             raise ValueError('Command is not available, write "min" or "hour"!')
 
             
-        schedule.every(i).minutes.do(hourly_weather_KGO, lat, lon, api_key, writer)
+        schedule.every(i).minutes.do(hourly_weather_KGO, lat, lon, api_key, writer, csvfile)
             
         while True:   
             schedule.run_pending()

@@ -40,6 +40,12 @@ services:
     build: Grishin
     env_file: ./Grishin/secret.env
 
+  kgo_openweather:
+    build: Koryukova
+    volumes:
+      - ./Koryukova/api_key.txt:/app/api_key.txt:ro
+      - ./Koryukova/data:/data
+
   astrometry:
     build: Lander
     command: ["/data/test.jpg"]
