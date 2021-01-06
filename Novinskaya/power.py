@@ -36,32 +36,4 @@ if __name__ == '__main__':
     
     power_kgo()
    
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   #График зависимости напряжения от времени
-#plt.plot(dates,vals)
-#plt.xticks(rotation=25)
-#plt.grid()
-#plt.ylabel('Voltage')
-#plt.xlabel('Data')
-#plt.title('')
-#plt.tick_params(axis='x', which='both', labelsize=8, direction = 'in')
-#plt.tick_params(axis='y', which='both', labelsize=8, direction = 'in')
-#plt.title('Voltage vs data')
-#plt.show()
+  
